@@ -15,10 +15,9 @@
  * put` (ver README.md de esta carpeta).
  */
 
-// Orígenes desde los que se permite pedir los datos. Cambia el primero por
-// tu URL real de GitHub Pages en cuanto la tengas.
+// Orígenes desde los que se permite pedir los datos.
 const ORIGENES_PERMITIDOS = [
-  'https://REEMPLAZA-TU-USUARIO.github.io',
+  'https://agusmltkd.github.io',
   'http://localhost:8080',
 ];
 

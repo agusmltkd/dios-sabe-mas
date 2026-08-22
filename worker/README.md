@@ -36,13 +36,14 @@ id = "a1b2c3d4..."
 Copia ese `id` y pégalo en `wrangler.toml`, sustituyendo
 `REEMPLAZA-CON-EL-ID-DEL-KV`.
 
-## 3. Decir qué orígenes pueden pedir los datos
+## 3. Orígenes permitidos
 
-Abre `oraciones-worker.js` y cambia `ORIGENES_PERMITIDOS`: sustituye
-`https://REEMPLAZA-TU-USUARIO.github.io` por tu URL real de GitHub Pages
-(la sabrás en cuanto actives Pages en el repo — normalmente
-`https://<tu-usuario>.github.io/<nombre-del-repo>`, pero el origen para
-CORS es solo el esquema+host, sin la ruta: `https://<tu-usuario>.github.io`).
+Ya está puesto en `oraciones-worker.js`: `https://agusmltkd.github.io`
+(el origen de tu GitHub Pages — la app se sirve en
+`https://agusmltkd.github.io/dios-sabe-mas/`, pero para CORS solo
+importa el esquema+host, sin la ruta) más `http://localhost:8080` para
+cuando pruebes en local contra el worker real. Si algún día cambias de
+usuario o de dominio propio, es la única línea que hay que tocar.
 
 ## 4. Desplegar el worker
 

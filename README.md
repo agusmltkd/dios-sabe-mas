@@ -39,9 +39,11 @@ y abre `http://localhost:8080/`.
 
 ## Desplegada
 
-- **App** (HTML/CSS/JS, sin contenido): GitHub Pages, desde este mismo repo.
+- **App** (HTML/CSS/JS, sin contenido): GitHub Pages, desde este mismo repo
+  → `https://agusmltkd.github.io/dios-sabe-mas/`.
 - **Datos**: worker de Cloudflare — ver [`worker/README.md`](worker/README.md)
-  para desplegarlo y para el enlace real una vez exista.
+  para desplegarlo. Sin el worker desplegado y con el KV sembrado, la
+  versión de Pages carga pero no tiene oraciones que mostrar.
 
 ## Ficheros
 
