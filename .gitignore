@@ -1,3 +1,9 @@
+# Documentación interna: contiene nombres propios y la estrategia sobre
+# derechos con la editorial, no debe salir del disco local. Sigue
+# existiendo, solo deja de subirse a GitHub.
+CLAUDE.md
+worker/README.md
+
 # El contenido del libro NUNCA se commitea, ni de prueba ni real — ver
 # worker/README.md. oraciones.json se regenera en local con:
 #   python generar_prueba.py
