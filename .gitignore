@@ -1,0 +1,19 @@
+# El contenido del libro NUNCA se commitea, ni de prueba ni real — ver
+# worker/README.md. oraciones.json se regenera en local con:
+#   python generar_prueba.py
+# y manifiesto.json lo produce digitalizar.py a partir de las fotos del
+# índice real, cuando llegue ese momento.
+oraciones.json
+manifiesto.json
+
+# fotos usadas por digitalizar.py — nunca deberían entrar en git
+fotos_indice/
+fotos_paginas/
+
+# temporales que a veces dejo tirados al comprobar la sintaxis del JS
+_extract*.js
+
+# basura habitual de Windows/editores
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,7 @@
+name = "dios-sabe-mas-datos"
+main = "oraciones-worker.js"
+compatibility_date = "2026-08-22"
+
+kv_namespaces = [
+  { binding = "ORACIONES_KV", id = "REEMPLAZA-CON-EL-ID-DEL-KV" }
+]
