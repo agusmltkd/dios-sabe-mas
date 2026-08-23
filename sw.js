@@ -4,11 +4,18 @@
  * Objetivo: que la app abra sin conexión, como el libro en papel, pero sin
  * quedarse congelada para siempre en la versión con la que se instaló.
  *
- * Política de actualización (a propósito, para una app de LECTURA):
- * el worker nuevo NO llama a skipWaiting() por su cuenta. Se queda en
- * espera, la app lo detecta y enseña un aviso discreto ("hay una versión
- * nueva"), y solo salta cuando la persona lo toca. Cambiarle el HTML bajo
- * los pies a alguien que está rezando es peor que esperar un rato.
+ * Política de actualización. El worker nuevo SÍ toma el control en cuanto
+ * se instala (skipWaiting + clients.claim). No es negociable: dejarlo en
+ * espera provocó un bloqueo real. El worker viejo era cache-first, servía
+ * siempre su index.html guardado, el nuevo se quedaba esperando, y lo
+ * único que podía despertarlo era un botón que vivía en el index.html
+ * nuevo que nunca llegaba a servirse. La app instalada quedó congelada
+ * para siempre en una versión rota.
+ *
+ * Lo de "no cambiar el HTML bajo los pies de quien está leyendo" se sigue
+ * respetando, pero se resuelve en la PÁGINA, no bloqueando aquí: el worker
+ * nuevo se activa (así el próximo arranque ya trae lo último) y la app
+ * enseña un aviso discreto; solo recarga cuando la persona lo toca.
  *
  * Estrategias:
  * - index.html y navegaciones: network-first. Con cache-first, una PWA ya
@@ -21,7 +28,7 @@
  * Al cambiar index.html, sube CACHE_VERSION: tira las cachés viejas.
  */
 
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v5";
 const CACHE_SHELL = `dios-sabe-mas-shell-${CACHE_VERSION}`;
 const CACHE_DATOS = `dios-sabe-mas-datos-${CACHE_VERSION}`;
 
@@ -37,9 +44,12 @@ const SHELL = [
 ];
 
 self.addEventListener("install", (evento) => {
-  // sin skipWaiting: espera a que la app lo pida (ver mensaje SALTAR_ESPERA)
   evento.waitUntil(
-    caches.open(CACHE_SHELL).then((cache) => cache.addAll(SHELL))
+    caches.open(CACHE_SHELL)
+      .then((cache) => cache.addAll(SHELL))
+      // toma el control sin esperar: si se queda esperando, un worker viejo
+      // cache-first puede dejar la app congelada para siempre (ver cabecera)
+      .then(() => self.skipWaiting())
   );
 });
 

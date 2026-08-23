@@ -26,3 +26,7 @@ desktop.ini
 
 # ajustes locales del editor/harness, no son del proyecto
 .claude/
+
+# dependencias solo de las pruebas (npm install --no-save)
+node_modules/
+package-lock.json

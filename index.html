@@ -426,7 +426,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v6 · 23 ago 2026';
+const VERSION_APP = 'v7 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -760,10 +760,11 @@ async function arrancar() {
 
 function mostrarError(e) {
   const detalle = document.getElementById('detalle-error');
-  if (detalle && e) {
-    detalle.textContent = navigator.onLine
-      ? 'No se pudo descargar el contenido (' + (e.message || e) + '). Vuelve a intentarlo en un momento.'
+  if (detalle) {
+    const base = navigator.onLine
+      ? 'No se pudo descargar el contenido (' + (e && (e.message || e)) + '). Vuelve a intentarlo en un momento.'
       : 'Estás sin conexión. Hace falta red la primera vez que abres la app, para descargar las oraciones. Después ya funciona sin cobertura.';
+    detalle.textContent = base + ' — ' + diagnostico();
   }
   mostrarPantalla('p-error', null);
 }
@@ -811,14 +812,12 @@ function registrarSW() {
     })
     .catch(() => {});
 
-  // Para una app de lectura no se recarga sola: cambiarle el HTML bajo los
-  // pies a quien está rezando es peor que esperar. Solo se recarga cuando
-  // la persona toca "Actualizar".
-  let recargando = false;
+  // El worker nuevo ya se ha activado (skipWaiting en sw.js), así que el
+  // próximo arranque traerá lo último pase lo que pase. Aquí NO se recarga
+  // sola: cambiarle el HTML bajo los pies a quien está rezando es peor que
+  // esperar. Solo se avisa; recarga quien toca "Actualizar".
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (recargando) return;
-    recargando = true;
-    location.reload();
+    avisarVersionNueva(null);
   });
 }
 
@@ -831,8 +830,9 @@ function avisarVersionNueva(worker) {
 function aplicarActualizacion() {
   const b = document.getElementById('banner-version');
   if (b) b.classList.remove('mostrar');
-  if (swEnEspera) swEnEspera.postMessage({ tipo: 'SALTAR_ESPERA' });
-  else location.reload();
+  // por si quedara alguno en espera (workers antiguos); si no, recarga y ya
+  if (swEnEspera) { try { swEnEspera.postMessage({ tipo: 'SALTAR_ESPERA' }); } catch (e) {} }
+  setTimeout(() => location.reload(), 120);
 }
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -1243,7 +1243,7 @@ function pantallaAjustes() {
   document.getElementById('valor-tema').textContent =
     ({ auto: 'Automático', dia: 'Día', noche: 'Noche' })[CONFIG.tema];
   document.getElementById('switch-wakelock').classList.toggle('off', !CONFIG.wakeLock);
-  document.getElementById('version-app').textContent = VERSION_APP;
+  document.getElementById('version-app').textContent = diagnostico();
   document.getElementById('valor-version-datos').textContent =
     META.version ? META.version + (META.fecha ? ' · ' + META.fecha : '') : `${ORACIONES.length} oraciones`;
 }
@@ -1442,15 +1442,49 @@ function montarGestos() {
 
 // -------------------------- inicio --------------------------
 
+// Diagnóstico para cuando algo falla en el móvil, donde no hay consola a
+// mano: sale en la pantalla de error y se puede leer en una captura.
+function diagnostico() {
+  const standalone = window.matchMedia('(display-mode: standalone)').matches ||
+                     window.navigator.standalone === true;
+  const sw = ('serviceWorker' in navigator)
+    ? (navigator.serviceWorker.controller ? 'activo' : 'sin controlar')
+    : 'no soportado';
+  return `${VERSION_APP} · ${standalone ? 'instalada' : 'navegador'} · sw ${sw} · ${ORACIONES.length} oraciones`;
+}
+
+// Ninguna excepción debe dejar la app muda: siempre se enseña qué pasó.
+function mostrarFalloArranque(motivo) {
+  try {
+    const detalle = document.getElementById('detalle-error');
+    if (detalle) {
+      detalle.textContent = 'Ha fallado algo al abrir: ' +
+        (motivo && motivo.message ? motivo.message : String(motivo)) + ' — ' + diagnostico();
+    }
+    mostrarPantalla('p-error', null);
+  } catch (e) { /* si ni esto va, no hay nada que hacer */ }
+}
+window.addEventListener('error', e => mostrarFalloArranque(e.error || e.message));
+window.addEventListener('unhandledrejection', e => mostrarFalloArranque(e.reason));
+
 function iniciar() {
-  registrarSW();
-  document.getElementById('campo-buscar').addEventListener('input', e => {
-    const q = e.target.value;
-    history.replaceState(null, '', location.pathname + '#/buscar' + (q ? ('?q=' + encodeURIComponent(q)) : ''));
-    renderizarBuscar(q);
-  });
-  document.getElementById('p-leer').addEventListener('scroll', actualizarProgreso);
-  montarGestos();
+  // 1. Pintar el armazón YA, antes de tocar nada que pueda fallar. Si algo
+  //    revienta después, al menos se ve la app y no un hueco en blanco.
+  try { render(); } catch (e) { console.error('render inicial:', e); }
+
+  // 2. Cablear la interfaz. Si algo de esto falla, la app sigue usable.
+  try {
+    document.getElementById('campo-buscar').addEventListener('input', e => {
+      const q = e.target.value;
+      history.replaceState(null, '', location.pathname + '#/buscar' + (q ? ('?q=' + encodeURIComponent(q)) : ''));
+      renderizarBuscar(q);
+    });
+    document.getElementById('p-leer').addEventListener('scroll', actualizarProgreso);
+    montarGestos();
+  } catch (e) { console.error('interfaz:', e); }
+
+  // 3. Service worker y datos, cada uno por su cuenta.
+  try { registrarSW(); } catch (e) { console.error('sw:', e); }
   arrancar().catch(e => { console.error('arranque:', e); mostrarError(e); });
 }
 
