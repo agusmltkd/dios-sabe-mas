@@ -91,6 +91,23 @@ await esperar(150);
 console.log('version en ajustes ->', doc.getElementById('version-app').textContent);
 console.log('version contenido  ->', doc.getElementById('valor-version-datos').textContent);
 
+// El aviso tiene que irse solo. Se quedaba asomando por abajo y parecia una
+// pastilla clara pegada a la pantalla para siempre.
+console.log('\n--- AVISOS ---');
+const aviso = doc.getElementById('aviso');
+window.mostrarAviso('probando');
+await esperar(80);
+const visible = aviso.classList.contains('mostrar');
+console.log('  al mostrarlo:', visible ? 'visible OK' : 'FALLO: no aparece');
+if (!visible) fallos++;
+await esperar(3000);
+const sigue = aviso.classList.contains('mostrar');
+console.log('  a los 3 s   :', sigue ? 'FALLO: sigue visible' : 'oculto OK');
+if (sigue) fallos++;
+await esperar(400);
+console.log('  texto tras ocultarse:', aviso.textContent === '' ? 'vacio OK' : `FALLO: "${aviso.textContent}"`);
+if (aviso.textContent !== '') fallos++;
+
 if (errores.length) { console.log('\nERRORES EN CONSOLA:'); errores.forEach(e => console.log('  ' + e)); }
 
 console.log('\n=== ' + (fallos ? fallos + ' FALLOS' : 'TODO OK') + ' ===');

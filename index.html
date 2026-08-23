@@ -170,7 +170,11 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .oracion .num{font-family:'Sacramento',cursive;font-size:3em;line-height:.85;color:var(--tinta-suave)}
 .oracion h2{font-family:'Sacramento',cursive;font-weight:400;font-size:1.8em;line-height:1.08;margin:.12em 0 .85em}
 .oracion p{font-size:calc(.93em * var(--tam));line-height:1.85;margin-bottom:.8em}
-.acciones{display:flex;justify-content:space-between;align-items:center;padding:.4em 0 .2em;border-top:1px solid var(--linea);margin-top:.35em}
+/* Fijo abajo mientras se lee. Con la letra en "enorme" el texto es tan
+   largo que la barra se iba al final del scroll y había que bajar hasta
+   abajo del todo para guardar o compartir. */
+.acciones{display:flex;justify-content:space-between;align-items:center;padding:.4em 0 .2em;border-top:1px solid var(--linea);margin-top:.35em;
+  position:sticky;bottom:0;background:var(--papel);z-index:3}
 .par-nav{display:inline-flex;gap:.2em}
 
 /* ---------- hoja inferior ---------- */
@@ -213,19 +217,27 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .paso-entrada{display:flex;flex-direction:column;align-items:center;width:100%}
 
 /* ---------- avisos ---------- */
+/* Ojo con esconder esto solo con transform: translateY(150%) es 150% de SU
+   PROPIO alto, y con el texto vacío el aviso mide ~26px, así que bajaba 38px
+   cuando su borde estaba a 56px del fondo — quedaban 18px asomando de forma
+   permanente. En modo noche su fondo es crema, así que se veía como una
+   pastilla clara pegada abajo. De ahí que visibility/opacity sean
+   obligatorias: garantizan que desaparece mida lo que mida. */
 .aviso{position:fixed;left:50%;bottom:calc(1.4em + env(safe-area-inset-bottom));transform:translate(-50%,150%);background:var(--tinta);color:var(--papel);
   padding:.8em 1.3em;border-radius:.7em;font-size:.85em;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
-  transition:transform .25s ease;z-index:70;max-width:88%;text-align:center}
+  transition:transform .25s ease,opacity .2s ease,visibility .2s;z-index:70;max-width:88%;text-align:center;
+  visibility:hidden;opacity:0;pointer-events:none}
 :root[data-tema="noche"] .aviso{color:var(--tinta-honda)}
-.aviso.mostrar{transform:translate(-50%,0)}
+.aviso.mostrar{transform:translate(-50%,0);visibility:visible;opacity:1;pointer-events:auto}
 
 /* aviso de versión nueva: discreto, no interrumpe la lectura */
 .banner{position:fixed;left:50%;bottom:calc(1.4em + env(safe-area-inset-bottom));transform:translate(-50%,180%);
   width:min(92%,520px);display:flex;align-items:center;gap:.9em;
   background:var(--papel-hueso);color:var(--tinta);border:1px solid var(--linea);
   padding:.85em 1.1em;border-radius:.8em;box-shadow:0 12px 30px -12px rgba(0,0,0,.55);
-  transition:transform .3s ease;z-index:69;font-size:.85em}
-.banner.mostrar{transform:translate(-50%,0)}
+  transition:transform .3s ease,opacity .2s ease,visibility .2s;z-index:69;font-size:.85em;
+  visibility:hidden;opacity:0;pointer-events:none}
+.banner.mostrar{transform:translate(-50%,0);visibility:visible;opacity:1;pointer-events:auto}
 .banner .txt{flex:1;line-height:1.4}
 .banner button{color:var(--tinta);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-size:.85em;
   border-bottom:1px solid var(--tinta-suave);padding-bottom:.1em;min-height:44px;display:inline-flex;align-items:center}
@@ -406,7 +418,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   </div>
 </div>
 
-<div class="aviso" id="aviso"></div>
+<div class="aviso" id="aviso" onclick="ocultarAviso()"></div>
 
 <div class="banner" id="banner-version">
   <div class="txt">Hay una versión nueva de la app.</div>
@@ -426,7 +438,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v7 · 23 ago 2026';
+const VERSION_APP = 'v8 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -555,7 +567,16 @@ function mostrarAviso(texto) {
   el.textContent = texto;
   el.classList.add('mostrar');
   clearTimeout(_avisoTimer);
-  _avisoTimer = setTimeout(() => el.classList.remove('mostrar'), 2600);
+  _avisoTimer = setTimeout(ocultarAviso, 2400);
+}
+function ocultarAviso() {
+  const el = document.getElementById('aviso');
+  if (!el) return;
+  clearTimeout(_avisoTimer);
+  el.classList.remove('mostrar');
+  // se vacía tras la transición: un aviso sin texto no debe poder quedarse
+  // asomando por abajo nunca más
+  setTimeout(() => { if (!el.classList.contains('mostrar')) el.textContent = ''; }, 300);
 }
 
 function descargarFichero(nombre, texto, tipo) {
