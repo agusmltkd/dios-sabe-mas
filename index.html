@@ -426,7 +426,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v5 · 23 ago 2026';
+const VERSION_APP = 'v6 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -453,7 +453,7 @@ const FUENTE_ORACIONES = HOSTS_REMOTOS.includes(location.hostname)
   : 'oraciones.json';
 
 let ORACIONES = [];               // oraciones en memoria, en orden de libro
-let META = { version: null, fecha: null };
+let META = { version: null, fecha: null, firma: null };
 let GUARDADAS = new Map();        // n -> fecha ISO de guardado
 let CONFIG = {
   tema: 'auto', tamano: 'mediano', wakeLock: false,
@@ -646,14 +646,26 @@ function normalizarPayload(datos) {
 async function descargarContenido(forzarRed) {
   const resp = await fetch(FUENTE_ORACIONES, forzarRed ? { cache: 'reload' } : {});
   if (!resp.ok) throw new Error('respuesta ' + resp.status);
-  return normalizarPayload(await resp.json());
+  const texto = await resp.text();
+  const payload = normalizarPayload(JSON.parse(texto));
+  // Firma del contenido tal cual llegó. Hace falta porque "version" puede
+  // venir vacía (el KV todavía tiene el formato viejo, sin envolver): sin
+  // esto, la app creería que cambió en cada arranque y avisaría siempre.
+  payload.firma = hashCadena(texto);
+  return payload;
+}
+
+function contenidoIgual(payload) {
+  if (META.firma != null && payload.firma != null) return META.firma === payload.firma;
+  if (META.version && payload.version) return META.version === payload.version;
+  return false;
 }
 
 async function guardarContenido(payload) {
   if (!payload.oraciones.length) throw new Error('el contenido venía vacío');
   await dbClear('oraciones');
   await dbPutTodos('oraciones', payload.oraciones);
-  META = { version: payload.version, fecha: payload.fecha };
+  META = { version: payload.version, fecha: payload.fecha, firma: payload.firma };
   await guardarMeta();
   ORACIONES = ordenarPorLibro(payload.oraciones);
 }
@@ -684,8 +696,7 @@ async function revalidarContenido() {
   let payload;
   try { payload = await descargarContenido(true); }
   catch (e) { return; }                    // sin red: seguimos con lo local
-  if (META.version && payload.version && META.version === payload.version) return;
-  if (!payload.oraciones.length) return;
+  if (!payload.oraciones.length || contenidoIgual(payload)) return;
   await guardarContenido(payload);
   render();
   mostrarAviso('Contenido actualizado');
@@ -1288,7 +1299,7 @@ async function reimportarContenido() {
   mostrarAviso('Buscando contenido nuevo…');
   try {
     const payload = await descargarContenido(true);
-    if (META.version && payload.version && META.version === payload.version) {
+    if (contenidoIgual(payload)) {
       mostrarAviso('Ya tienes la última versión');
       return;
     }

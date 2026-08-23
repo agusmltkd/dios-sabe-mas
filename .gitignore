@@ -23,3 +23,6 @@ _extract*.js
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# ajustes locales del editor/harness, no son del proyecto
+.claude/
