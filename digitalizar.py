@@ -23,6 +23,7 @@ import os
 import re
 import sys
 import unicodedata
+from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -88,6 +89,44 @@ def parecido(a: str, b: str) -> float:
 def fotos(carpeta: str):
     exts = {".jpg", ".jpeg", ".png", ".heic", ".webp"}
     return sorted(p for p in Path(carpeta).iterdir() if p.suffix.lower() in exts)
+
+
+def leer_oraciones() -> list:
+    """Acepta las dos formas del fichero: el array pelado de las primeras
+    versiones y el objeto {version, fecha, oraciones} que se escribe ahora."""
+    datos = json.loads(ORACIONES.read_text(encoding="utf-8"))
+    return datos if isinstance(datos, list) else datos.get("oraciones", [])
+
+
+def escribir_oraciones(lista: list) -> None:
+    """Escribe con version y fecha. La app las compara para saber si tiene
+    que bajarse contenido nuevo, y las enseña en Ajustes: cuando alguien
+    diga «a mí no me sale eso», lo primero es saber qué versión tiene."""
+    anterior = None
+    if ORACIONES.exists():
+        try:
+            previo = json.loads(ORACIONES.read_text(encoding="utf-8"))
+            if isinstance(previo, dict):
+                anterior = previo.get("version")
+        except Exception:
+            pass
+
+    # libro-1, libro-2, ... cada vez que se reescribe el contenido real
+    n = 1
+    if anterior and anterior.startswith("libro-"):
+        try:
+            n = int(anterior.split("-")[1]) + 1
+        except (IndexError, ValueError):
+            pass
+
+    payload = {
+        "version": f"libro-{n}",
+        "fecha": date.today().isoformat(),
+        "oraciones": lista,
+    }
+    ORACIONES.write_text(json.dumps(payload, ensure_ascii=False, indent=2),
+                         encoding="utf-8")
+    print(f"Versión del contenido: {payload['version']} · {payload['fecha']}")
 
 
 # --------------------------------------------------------------------------
@@ -210,8 +249,7 @@ def paso_paginas(carpeta):
     for o in final:
         o["busqueda"] = normalizar(o["titulo"] + " " + " ".join(o["parrafos"]))
 
-    ORACIONES.write_text(json.dumps(final, ensure_ascii=False, indent=2),
-                         encoding="utf-8")
+    escribir_oraciones(final)
     print(f"\n{len(final)} oraciones -> {ORACIONES}")
 
 
@@ -224,7 +262,7 @@ def paso_validar():
         sys.exit("Faltan manifiesto.json u oraciones.json.")
 
     man = {e["n"]: e for e in json.loads(MANIFIESTO.read_text(encoding="utf-8"))}
-    ora = {o["n"]: o for o in json.loads(ORACIONES.read_text(encoding="utf-8"))}
+    ora = {o["n"]: o for o in leer_oraciones()}
 
     print(f"Manifiesto: {len(man)}   Transcritas: {len(ora)}\n")
 
@@ -238,15 +276,41 @@ def paso_validar():
     if sobran:
         print(f"No están en el índice: {sobran}\n")
 
+    # huecos en la numeración, aunque el manifiesto tampoco los tenga
+    numeros = sorted(ora)
+    if numeros:
+        huecos = sorted(set(range(min(numeros), max(numeros) + 1)) - set(numeros))
+        if huecos:
+            print(f"Huecos en la numeración: {huecos}\n")
+
+    largos = [len(" ".join(o["parrafos"]).split()) for o in ora.values()]
+    mediana = sorted(largos)[len(largos) // 2] if largos else 0
+
     problemas = []
+    ilegibles = []
     for n, o in sorted(ora.items()):
         cuerpo = " ".join(o["parrafos"])
+        palabras = len(cuerpo.split())
+
         if n in man and parecido(o["titulo"], man[n]["titulo"]) < 0.85:
             problemas.append((n, f"título distinto del índice: «{o['titulo']}»"))
-        if len(cuerpo.split()) < 25:
-            problemas.append((n, f"cuerpo muy corto ({len(cuerpo.split())} palabras)"))
+
+        # Todos los títulos del libro empiezan por "Para…". Si uno no lo
+        # hace, casi seguro que el OCR se comió el principio.
+        if not normalizar(o["titulo"]).startswith("para"):
+            problemas.append((n, f"el título no empieza por «Para»: «{o['titulo']}»"))
+
+        if palabras < 25:
+            problemas.append((n, f"cuerpo muy corto ({palabras} palabras)"))
+        elif mediana and palabras < mediana * 0.45:
+            # sospechosamente corta comparada con el resto del libro:
+            # suele ser media oración que se quedó en la otra página
+            problemas.append((n, f"mucho más corta de lo normal ({palabras} palabras, "
+                                 f"mediana {mediana})"))
+
         if "[ilegible]" in cuerpo:
-            problemas.append((n, "contiene [ilegible]"))
+            ilegibles.append((n, o.get("pagina") or man.get(n, {}).get("pagina"),
+                              cuerpo.count("[ilegible]"), o["titulo"]))
         if not o.get("completa", True):
             problemas.append((n, "quedó marcada como incompleta"))
         if len(o["parrafos"]) < 2:
@@ -256,7 +320,19 @@ def paso_validar():
         print("A REVISAR A OJO:")
         for n, m in problemas:
             print(f"  {n:>3}  {m}")
-    else:
+        print()
+
+    # Lista aparte y ordenada por página: son las que hay que repasar con el
+    # libro delante, y así se hacen todas de una sentada en vez de ir y venir.
+    if ilegibles:
+        print(f"FRAGMENTOS [ilegible] — {sum(i[2] for i in ilegibles)} en "
+              f"{len(ilegibles)} oraciones, por orden de página:")
+        for n, pagina, cuantos, titulo in sorted(ilegibles, key=lambda x: (x[1] or 9999, x[0])):
+            veces = "" if cuantos == 1 else f" (x{cuantos})"
+            print(f"  p.{pagina or '?':>4}  nº{n:<4}{veces:<6} {titulo}")
+        print()
+
+    if not problemas and not ilegibles:
         print("Sin incidencias.")
 
     # enriquecer con capítulo y página del índice
@@ -264,11 +340,9 @@ def paso_validar():
         if n in man:
             o["capitulo"] = man[n].get("capitulo")
             o.setdefault("pagina", man[n].get("pagina"))
-    ORACIONES.write_text(
-        json.dumps([ora[k] for k in sorted(ora)], ensure_ascii=False, indent=2),
-        encoding="utf-8")
+    escribir_oraciones([ora[k] for k in sorted(ora)])
 
-    revisar = len(faltan) + len({n for n, _ in problemas})
+    revisar = len(faltan) + len({n for n, _ in problemas} | {i[0] for i in ilegibles})
     print(f"\nDe {len(man)} oraciones, tienes que mirar {revisar} a mano.")
 
 

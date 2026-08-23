@@ -31,9 +31,16 @@ Uso:
 import json
 import re
 import unicodedata
+from datetime import date
 from pathlib import Path
 
 ORACIONES = Path("oraciones.json")
+
+# Sube esto a mano cada vez que cambie el contenido. La app compara esta
+# cadena con la que ya tiene guardada: si difiere, se baja el contenido
+# nuevo; si coincide, no gasta datos. También se enseña en Ajustes, para
+# saber qué versión tiene alguien cuando diga "a mí no me sale eso".
+VERSION_CONTENIDO = "prueba-1"
 
 RELLENO = [
     "[Texto de prueba: aquí irá el cuerpo real de la página del libro, "
@@ -112,12 +119,18 @@ def construir():
         o["busqueda"] = normalizar(titulo + " " + " ".join(parrafos))
         salida.append(o)
 
-    ORACIONES.write_text(json.dumps(salida, ensure_ascii=False, indent=2),
+    payload = {
+        "version": VERSION_CONTENIDO,
+        "fecha": date.today().isoformat(),
+        "oraciones": salida,
+    }
+    ORACIONES.write_text(json.dumps(payload, ensure_ascii=False, indent=2),
                          encoding="utf-8")
 
     reales = sum(1 for o in salida if not o["ficticio"])
     print(f"{len(salida)} oraciones de prueba -> {ORACIONES} "
           f"({reales} reales, {len(salida) - reales} ficticias)")
+    print(f"Versión del contenido: {VERSION_CONTENIDO} · {payload['fecha']}")
     print(f"Capítulos: {', '.join(ORDEN_CAPITULOS)}")
 
 

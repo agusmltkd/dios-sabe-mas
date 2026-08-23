@@ -1,22 +1,27 @@
 /*
  * sw.js — service worker de "Dios sabe más".
  *
- * Objetivo sencillo: que la app abra sin conexión, como el libro en papel.
+ * Objetivo: que la app abra sin conexión, como el libro en papel, pero sin
+ * quedarse congelada para siempre en la versión con la que se instaló.
  *
- * - index.html (y cualquier navegación): NETWORK-FIRST. Con cache-first,
- *   una vez instalada en el móvil la app se quedaba congelada para siempre
- *   en la primera versión: las correcciones se desplegaban en GitHub Pages
- *   pero el teléfono seguía sirviendo su copia vieja. Ahora, si hay red, se
- *   coge siempre la última; si no hay, se cae a la copia guardada y sigue
- *   funcionando offline igual.
- * - Resto del shell (manifest, iconos): cache-first, casi nunca cambian.
- * - oraciones.json: network-first con caída a caché, por lo mismo.
+ * Política de actualización (a propósito, para una app de LECTURA):
+ * el worker nuevo NO llama a skipWaiting() por su cuenta. Se queda en
+ * espera, la app lo detecta y enseña un aviso discreto ("hay una versión
+ * nueva"), y solo salta cuando la persona lo toca. Cambiarle el HTML bajo
+ * los pies a alguien que está rezando es peor que esperar un rato.
  *
- * Al cambiar index.html conviene subir CACHE_VERSION: fuerza a tirar las
- * cachés viejas y a que el service worker nuevo tome el control.
+ * Estrategias:
+ * - index.html y navegaciones: network-first. Con cache-first, una PWA ya
+ *   instalada nunca se enteraba de las correcciones. Offline sigue
+ *   funcionando: cae a la copia guardada.
+ * - Resto del shell (manifest, iconos, fuentes): cache-first, no cambian.
+ * - oraciones.json: network-first con caída a caché. La app además hace su
+ *   propio stale-while-revalidate contra IndexedDB.
+ *
+ * Al cambiar index.html, sube CACHE_VERSION: tira las cachés viejas.
  */
 
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_SHELL = `dios-sabe-mas-shell-${CACHE_VERSION}`;
 const CACHE_DATOS = `dios-sabe-mas-datos-${CACHE_VERSION}`;
 
@@ -32,10 +37,9 @@ const SHELL = [
 ];
 
 self.addEventListener("install", (evento) => {
+  // sin skipWaiting: espera a que la app lo pida (ver mensaje SALTAR_ESPERA)
   evento.waitUntil(
-    caches.open(CACHE_SHELL)
-      .then((cache) => cache.addAll(SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_SHELL).then((cache) => cache.addAll(SHELL))
   );
 });
 
@@ -51,17 +55,24 @@ self.addEventListener("activate", (evento) => {
   );
 });
 
+// La app manda esto cuando la persona toca "Actualizar" en el aviso.
+self.addEventListener("message", (evento) => {
+  if (evento.data && evento.data.tipo === "SALTAR_ESPERA") self.skipWaiting();
+});
+
 self.addEventListener("fetch", (evento) => {
   const url = new URL(evento.request.url);
-  if (evento.request.method !== "GET" || url.origin !== self.location.origin) return;
+  if (evento.request.method !== "GET") return;
+
+  // El contenido vive en el worker de Cloudflare, otro origen. Que pase de
+  // largo: lo gestiona la propia app contra IndexedDB.
+  if (url.origin !== self.location.origin) return;
 
   if (url.pathname.endsWith("/oraciones.json")) {
-    evento.respondWith(redSobreCache(evento.request));
+    evento.respondWith(redSobreCache(evento.request, CACHE_DATOS));
     return;
   }
 
-  // la propia app: siempre la última si hay red, para que las correcciones
-  // lleguen al móvil sin tener que desinstalarla y volverla a añadir
   const esApp = evento.request.mode === "navigate" ||
                 url.pathname.endsWith("/index.html") ||
                 url.pathname.endsWith("/");
@@ -76,28 +87,25 @@ self.addEventListener("fetch", (evento) => {
 async function cacheSobreRed(peticion) {
   const enCache = await caches.match(peticion);
   if (enCache) return enCache;
-  try {
-    const respuesta = await fetch(peticion);
+  const respuesta = await fetch(peticion);
+  if (respuesta && respuesta.ok) {
     const cache = await caches.open(CACHE_SHELL);
     cache.put(peticion, respuesta.clone());
-    return respuesta;
-  } catch (e) {
-    // navegación sin red y sin copia previa: al menos ofrece la app
-    if (peticion.mode === "navigate") return caches.match("./index.html");
-    throw e;
   }
+  return respuesta;
 }
 
-async function redSobreCache(peticion, dondeGuardar = CACHE_DATOS) {
+async function redSobreCache(peticion, dondeGuardar) {
   try {
     const respuesta = await fetch(peticion);
-    const cache = await caches.open(dondeGuardar);
-    cache.put(peticion, respuesta.clone());
+    if (respuesta && respuesta.ok) {
+      const cache = await caches.open(dondeGuardar);
+      cache.put(peticion, respuesta.clone());
+    }
     return respuesta;
   } catch (e) {
     const enCache = await caches.match(peticion);
     if (enCache) return enCache;
-    // navegación sin red y sin copia de esta URL exacta: ofrece la app
     if (peticion.mode === "navigate") {
       const app = await caches.match("./index.html");
       if (app) return app;

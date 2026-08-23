@@ -3,13 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#3E5A67">
+<meta name="theme-color" content="#3E5A67" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#294351" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Las 300 oraciones de Dios sabe más, de Ignacio del Rey, a mano en el móvil. Sin conexión, sin cuenta.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dios sabe más">
 <title>Dios sabe más</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="iconos/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
 <script>
 // El tema real vive en IndexedDB (async) junto al resto de CONFIG, así que
 // no se puede leer a tiempo para el primer pintado. Se guarda además una
@@ -25,9 +29,6 @@
   } catch (e) {}
 })();
 </script>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="iconos/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
 <style>
 @font-face{font-family:'Jost';font-style:normal;font-weight:200;font-display:block;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+2074,U+20AC,U+2212}
 @font-face{font-family:'Jost';font-style:normal;font-weight:300;font-display:block;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+2074,U+20AC,U+2212}
@@ -37,7 +38,11 @@
 :root{
   --tinta:#3E5A67;
   --tinta-honda:#294351;
+  /* decorativo: numerales grandes, barras. No para texto pequeño. */
   --tinta-suave:#7D97A3;
+  /* texto secundario pequeño. #7D97A3 sobre --papel da 2.90 de contraste
+     y no llega a AA (4.5); este da 4.77. */
+  --tinta-secundaria:#5A7280;
   --papel:#FBF8F2;
   --papel-hueso:#F3EDE1;
   --crema:#EFE2C6;
@@ -48,7 +53,8 @@
   --papel:#294351;
   --papel-hueso:#1c2f3a;
   --tinta:#EFE2C6;
-  --tinta-suave:rgba(239,226,198,.6);
+  --tinta-suave:rgba(239,226,198,.55);
+  --tinta-secundaria:rgba(239,226,198,.78);
   --linea:rgba(239,226,198,.18);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -56,24 +62,26 @@ html,body{height:100%;overscroll-behavior:none}
 body{min-height:100dvh}
 html{-webkit-text-size-adjust:100%}
 button{all:unset;cursor:pointer;box-sizing:border-box;font:inherit;color:inherit}
-button:focus-visible,input:focus-visible{outline:2px solid var(--tinta-suave);outline-offset:2px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--tinta-secundaria);outline-offset:2px}
 body{
   background:var(--tinta-honda);color:var(--tinta);
   font-family:'Jost',-apple-system,'Segoe UI',sans-serif;font-weight:300;
   line-height:1.6;
-  /* contenedor flex: .app se estira hasta el fondo exacto de la pantalla.
-     Antes .app usaba min-height:100dvh y en iOS instalado acababa midiendo
-     menos que la pantalla, dejando el navbar flotando a media altura. */
+  /* contenedor flex: .app se estira hasta el fondo exacto de la pantalla */
   display:flex;flex-direction:column;
 }
-/* que no se sienta como una página web: sin zoom, sin seleccionar texto,
-   sin el menú de "mantener pulsado", sin el flash gris al tocar, sin el
-   rebote de scroll que asoma el fondo del sistema por los bordes. */
+/* que no se sienta como una página web: sin zoom, sin el menú de
+   "mantener pulsado", sin flash gris al tocar, sin rebote de scroll. */
 html,body{touch-action:manipulation}
 body{
   -webkit-user-select:none;user-select:none;
   -webkit-touch-callout:none;
   -webkit-tap-highlight-color:transparent;
+}
+/* ...pero el cuerpo de la oración SÍ se puede seleccionar y copiar: es
+   texto para leer, y bloquearlo entero también estorbaba a VoiceOver. */
+.seleccionable,.seleccionable *{
+  -webkit-user-select:text;user-select:text;-webkit-touch-callout:default;
 }
 input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .pantalla,.hoja{overscroll-behavior-y:contain}
@@ -84,8 +92,7 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
   flex:1 1 auto;min-height:0;
   display:flex;flex-direction:column;overflow:hidden;
   container-type:inline-size;font-size:clamp(14px,3.3cqw,16.5px);
-  /* deja sitio al notch/Dynamic Island y a la barra de gestos de abajo
-     cuando la app corre instalada a pantalla completa (viewport-fit=cover) */
+  /* sitio para el notch/Dynamic Island y la barra de gestos de iOS */
   padding-top:env(safe-area-inset-top);
   padding-bottom:env(safe-area-inset-bottom);
   padding-left:env(safe-area-inset-left);
@@ -97,11 +104,10 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 }
 .pantalla{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;flex-direction:column;padding:1.5em 1.4em 1.2em}
 .pantalla.mostrar{display:flex}
-.navbar{flex:0 0 auto;display:flex;padding:.8em 0 1.1em;border-top:1px solid var(--linea);margin:0 1.4em}
-.navbar button{flex:1;text-align:center;font-size:.7em;letter-spacing:.13em;text-transform:uppercase;color:var(--tinta-suave);opacity:.75;flex-direction:column;display:flex;align-items:center;justify-content:center}
-.navbar button.on{color:var(--tinta);opacity:1}
+.navbar{flex:0 0 auto;display:flex;padding:.5em 0 .8em;border-top:1px solid var(--linea);margin:0 1.4em}
+.navbar button{flex:1;min-height:44px;text-align:center;font-size:.7em;letter-spacing:.13em;text-transform:uppercase;color:var(--tinta-secundaria);flex-direction:column;display:flex;align-items:center;justify-content:center}
+.navbar button.on{color:var(--tinta)}
 .navbar i{display:block;font-style:normal;font-size:1.3em;margin-bottom:.22em}
-@media (hover:hover){.navbar button:hover{opacity:1}}
 
 /* ---------- barra vertical: motivo del libro ---------- */
 .rail{width:.4em;border-radius:.2em;background:var(--tinta);flex:0 0 auto}
@@ -112,27 +118,27 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 
 /* ---------- marca ---------- */
 .marca{padding:.55em 0 1.3em;text-align:center}
-.marca .m1{font-family:'Sacramento',cursive;font-size:1.4em;color:var(--tinta-suave);line-height:1}
+.marca .m1{font-family:'Sacramento',cursive;font-size:1.4em;color:var(--tinta-secundaria);line-height:1}
 .marca .m2{font-size:1.3em;letter-spacing:.26em;font-weight:200;margin-top:.12em}
 .marca .m2.chico{font-size:1.1em}
 
 /* ---------- controles ---------- */
-.buscador{display:flex;align-items:center;gap:.6em;border:1px solid var(--linea);border-radius:.7em;padding:.82em 1em;background:var(--papel-hueso);width:100%;text-align:left}
-.buscador span{font-size:1.05em;opacity:.45}
-.buscador em{font-style:normal;color:var(--tinta-suave);font-size:.95em}
+.buscador{display:flex;align-items:center;gap:.6em;border:1px solid var(--linea);border-radius:.7em;padding:.82em 1em;background:var(--papel-hueso);width:100%;text-align:left;min-height:44px}
+.buscador span{font-size:1.05em;opacity:.55;display:flex}
+.buscador em{font-style:normal;color:var(--tinta-secundaria);font-size:.95em}
 #campo-buscar{flex:1;background:none;border:none;outline:none;font-family:'Jost',sans-serif;font-weight:300;font-size:1em;color:var(--tinta);min-width:0}
-#campo-buscar::placeholder{color:var(--tinta-suave)}
+#campo-buscar::placeholder{color:var(--tinta-secundaria)}
+.ico-buscar{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .chips{display:flex;flex-wrap:wrap;gap:.45em;margin-top:1em}
-.chip{border:1px solid var(--linea);border-radius:2em;padding:.4em .92em;font-size:.85em;background:var(--papel-hueso)}
-.boton{display:flex;align-items:center;justify-content:center;gap:.6em;background:var(--tinta);color:var(--papel);border-radius:.7em;padding:.95em;font-size:.86em;letter-spacing:.14em;text-transform:uppercase}
+.chip{border:1px solid var(--linea);border-radius:2em;padding:.55em .95em;font-size:.85em;background:var(--papel-hueso);min-height:36px;display:inline-flex;align-items:center}
+.boton{display:flex;align-items:center;justify-content:center;gap:.6em;background:var(--tinta);color:var(--papel);border-radius:.7em;padding:.95em;font-size:.86em;letter-spacing:.14em;text-transform:uppercase;min-height:44px}
 :root[data-tema="noche"] .boton:not(.hueco){color:var(--tinta-honda)}
 .boton:hover{filter:brightness(1.08)}
 .boton.hueco{background:none;color:var(--tinta);border:1px dashed var(--tinta-suave)}
-.bloque-tit{font-size:.72em;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-suave);margin:1.6em 0 .65em}
-.contador{font-size:.76em;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-suave);margin:1em 0 .2em}
-.lect-top{display:flex;justify-content:space-between;align-items:center;padding:.5em 0 1.1em;font-size:1.1em}
-.icono-plano{font-size:1.05em;opacity:.75;padding:.35em .45em;line-height:1}
-.ico-buscar{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;vertical-align:-.125em}
+.bloque-tit{font-size:.72em;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-secundaria);margin:1.6em 0 .65em}
+.contador{font-size:.76em;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-secundaria);margin:1em 0 .2em}
+.lect-top{display:flex;justify-content:space-between;align-items:center;padding:.2em 0 .8em;font-size:1.1em}
+.icono-plano{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;font-size:1.05em;opacity:.8;line-height:1}
 .icono-plano.on{opacity:1}
 .icono-plano:hover{opacity:1}
 
@@ -140,19 +146,19 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 .tarjeta{display:flex;gap:.85em;background:var(--papel-hueso);border:1px solid var(--linea);border-radius:.7em;padding:.85em 1em;text-align:left}
 .tarjeta .num{font-family:'Sacramento',cursive;font-size:1.95em;line-height:.9;color:var(--tinta-suave)}
 .tarjeta .tit{font-family:'Sacramento',cursive;font-size:1.3em;line-height:1.12}
-.res{display:flex;gap:.85em;padding:.9em 0;border-bottom:1px solid var(--linea);text-align:left}
+.res{display:flex;gap:.85em;padding:.85em 0;border-bottom:1px solid var(--linea);text-align:left;min-height:44px;align-items:flex-start}
 .res .num{font-family:'Sacramento',cursive;font-size:1.7em;line-height:.95;color:var(--tinta-suave);min-width:1.25em}
 .res .tit{font-family:'Sacramento',cursive;font-size:1.26em;line-height:1.1}
-.res .frag{font-size:.8em;color:var(--tinta-suave);margin-top:.22em;line-height:1.45}
+.res .frag{font-size:.8em;color:var(--tinta-secundaria);margin-top:.22em;line-height:1.45}
 mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-radius:.15em}
-.grupo{display:flex;align-items:center;gap:.8em;padding:.98em 0;border-bottom:1px solid var(--linea);text-align:left}
+.grupo{display:flex;align-items:center;gap:.8em;padding:.9em 0;border-bottom:1px solid var(--linea);text-align:left;min-height:44px}
 .grupo .g{font-size:.98em}
-.grupo .n{margin-left:auto;font-size:.8em;color:var(--tinta-suave)}
-.fila{display:flex;align-items:center;gap:.8em;padding:.95em 0;border-bottom:1px solid var(--linea);font-size:.92em;text-align:left}
-.fila .v{margin-left:auto;font-size:.85em;color:var(--tinta-suave)}
+.grupo .n{margin-left:auto;font-size:.8em;color:var(--tinta-secundaria)}
+.fila{display:flex;align-items:center;gap:.8em;padding:.85em 0;border-bottom:1px solid var(--linea);font-size:.92em;text-align:left;min-height:44px}
+.fila .v{margin-left:auto;font-size:.85em;color:var(--tinta-secundaria)}
 .sw{margin-left:auto;width:2.2em;height:1.25em;border-radius:1em;background:var(--tinta);position:relative;flex:0 0 auto}
 .sw::after{content:'';position:absolute;width:.95em;height:.95em;border-radius:50%;background:var(--papel);top:.15em;right:.15em}
-.sw.off{background:rgba(125,151,163,.35)}
+.sw.off{background:rgba(125,151,163,.45)}
 .sw.off::after{right:auto;left:.15em}
 @media (hover:hover){
   .chip:hover,.fila:hover,.grupo:hover,.res:hover,.tarjeta:hover,.opcion:not(.on):hover{background:var(--linea)}
@@ -164,10 +170,8 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .oracion .num{font-family:'Sacramento',cursive;font-size:3em;line-height:.85;color:var(--tinta-suave)}
 .oracion h2{font-family:'Sacramento',cursive;font-weight:400;font-size:1.8em;line-height:1.08;margin:.12em 0 .85em}
 .oracion p{font-size:calc(.93em * var(--tam));line-height:1.85;margin-bottom:.8em}
-.acciones{display:flex;justify-content:space-between;align-items:center;padding:.95em 0 .2em;border-top:1px solid var(--linea);margin-top:.35em}
-.acciones>*{font-size:1.12em;opacity:.55}
-.acciones>*.on{opacity:1}
-.par-nav{display:inline-flex;gap:.4em}
+.acciones{display:flex;justify-content:space-between;align-items:center;padding:.4em 0 .2em;border-top:1px solid var(--linea);margin-top:.35em}
+.par-nav{display:inline-flex;gap:.2em}
 
 /* ---------- hoja inferior ---------- */
 .velo{position:fixed;inset:0;background:rgba(41,67,81,.4);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s ease}
@@ -178,28 +182,28 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   box-shadow:0 -14px 30px -14px rgba(41,67,81,.5);z-index:41;transition:transform .25s ease;max-height:80vh;overflow-y:auto}
 .hoja.mostrar{transform:translate(-50%,0)}
 .hoja .asa{width:2.4em;height:.25em;border-radius:.2em;background:var(--tinta-suave);opacity:.5;margin:0 auto .95em}
-.hoja h3{font-weight:400;font-size:.76em;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-suave);margin-bottom:.8em}
-.tamanos{display:flex;align-items:baseline;justify-content:space-between;padding:.3em 0 1em;border-bottom:1px solid var(--linea);margin-bottom:.3em}
-.tamanos button{opacity:.4}
+.hoja h3{font-weight:400;font-size:.76em;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-secundaria);margin-bottom:.8em}
+.tamanos{display:flex;align-items:center;justify-content:space-between;padding:.3em 0 1em;border-bottom:1px solid var(--linea);margin-bottom:.3em}
+.tamanos button{opacity:.45;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 .tamanos button.on{opacity:1}
 .opciones{display:flex;gap:.7em;padding-top:.9em}
-.opcion{flex:1;text-align:center;border:1px solid var(--linea);border-radius:.6em;padding:.75em .3em;font-size:.72em;letter-spacing:.1em;text-transform:uppercase}
+.opcion{flex:1;text-align:center;border:1px solid var(--linea);border-radius:.6em;padding:.75em .3em;font-size:.72em;letter-spacing:.1em;text-transform:uppercase;min-height:44px}
 .opcion i{display:block;font-style:normal;font-size:1.5em;margin-bottom:.25em;letter-spacing:0}
 .opcion.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
 
-/* ---------- vacíos ---------- */
+/* ---------- vacíos y errores ---------- */
 .vacio{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:3em}
-.vacio .ico{font-size:2.4em;color:var(--tinta-suave);opacity:.5;margin-bottom:.5em}
+.vacio .ico{font-size:2.4em;color:var(--tinta-suave);margin-bottom:.5em}
 .vacio .t{font-family:'Sacramento',cursive;font-size:1.75em;line-height:1.15;margin-bottom:.4em}
-.vacio .d{font-size:.86em;color:var(--tinta-suave);max-width:22ch;line-height:1.55;margin-bottom:1.3em}
+.vacio .d{font-size:.86em;color:var(--tinta-secundaria);max-width:24ch;line-height:1.55;margin-bottom:1.3em}
 
 /* ---------- obra ---------- */
 .autor{text-align:center;padding:.4em 0 1.1em}
 .autor .n{font-family:'Sacramento',cursive;font-size:1.85em;line-height:1.1}
-.autor .r{font-size:.78em;color:var(--tinta-suave);letter-spacing:.06em;margin-top:.25em;line-height:1.5}
+.autor .r{font-size:.78em;color:var(--tinta-secundaria);letter-spacing:.06em;margin-top:.25em;line-height:1.5}
 .prosa{font-size:.88em;line-height:1.8}
 .prosa p{margin-bottom:.7em}
-.pie{font-size:.72em;color:var(--tinta-suave);text-align:center;padding:1em 0 1.4em;line-height:1.6;letter-spacing:.04em}
+.pie{font-size:.72em;color:var(--tinta-secundaria);text-align:center;padding:1em 0 1.4em;line-height:1.6;letter-spacing:.04em}
 
 /* ---------- entrada / onboarding ---------- */
 .overlay-entrada{position:fixed;inset:0;background:var(--tinta-honda);color:var(--crema);z-index:60;
@@ -208,11 +212,23 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .overlay-entrada[hidden]{display:none}
 .paso-entrada{display:flex;flex-direction:column;align-items:center;width:100%}
 
-/* ---------- aviso ---------- */
+/* ---------- avisos ---------- */
 .aviso{position:fixed;left:50%;bottom:calc(1.4em + env(safe-area-inset-bottom));transform:translate(-50%,150%);background:var(--tinta);color:var(--papel);
   padding:.8em 1.3em;border-radius:.7em;font-size:.85em;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
   transition:transform .25s ease;z-index:70;max-width:88%;text-align:center}
+:root[data-tema="noche"] .aviso{color:var(--tinta-honda)}
 .aviso.mostrar{transform:translate(-50%,0)}
+
+/* aviso de versión nueva: discreto, no interrumpe la lectura */
+.banner{position:fixed;left:50%;bottom:calc(1.4em + env(safe-area-inset-bottom));transform:translate(-50%,180%);
+  width:min(92%,520px);display:flex;align-items:center;gap:.9em;
+  background:var(--papel-hueso);color:var(--tinta);border:1px solid var(--linea);
+  padding:.85em 1.1em;border-radius:.8em;box-shadow:0 12px 30px -12px rgba(0,0,0,.55);
+  transition:transform .3s ease;z-index:69;font-size:.85em}
+.banner.mostrar{transform:translate(-50%,0)}
+.banner .txt{flex:1;line-height:1.4}
+.banner button{color:var(--tinta);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-size:.85em;
+  border-bottom:1px solid var(--tinta-suave);padding-bottom:.1em;min-height:44px;display:inline-flex;align-items:center}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -231,18 +247,18 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
       <div class="m1">300 oraciones para rezar con la vida</div>
       <div class="m2">DIOS SABE MÁS</div>
     </div>
-    <button class="buscador" onclick="location.hash='#/buscar'"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><em>Dilo con tus palabras</em></button>
+    <button class="buscador" onclick="location.hash='#/buscar'"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><em>Dilo con tus palabras, o el número</em></button>
     <div class="chips" id="chips-hoy"></div>
-    <div style="margin-top:1.1em">
-      <button class="boton hueco" style="width:100%" onclick="irAlAzar()">◈ Abrir al azar</button>
-    </div>
+    <div id="bloque-dia"></div>
     <div id="seguias-aqui"></div>
+    <div id="recientes-hoy"></div>
+    <div style="margin-top:1.3em"><button class="boton hueco" style="width:100%" onclick="irAlAzar()">◈ Abrir al azar</button></div>
   </section>
 
   <!-- BUSCAR -->
   <section class="pantalla" id="p-buscar">
-    <div class="lect-top"><button class="icono-plano" onclick="history.back()">‹</button><span></span></div>
-    <div class="buscador"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="campo-buscar" type="search" enterkeyhint="search" placeholder="Dilo con tus palabras" autocomplete="off"></div>
+    <div class="lect-top"><button class="icono-plano" onclick="volver()" aria-label="Atrás">‹</button><span></span></div>
+    <div class="buscador"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="campo-buscar" type="search" inputmode="text" enterkeyhint="search" placeholder="Dilo con tus palabras, o el número" autocomplete="off"></div>
     <div id="contenido-buscar"></div>
   </section>
 
@@ -256,8 +272,8 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   <!-- CAPITULO -->
   <section class="pantalla" id="p-capitulo">
     <div class="lect-top">
-      <button class="icono-plano" onclick="history.back()">‹</button>
-      <button class="icono-plano" onclick="location.hash='#/buscar'"><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="icono-plano" onclick="volver()" aria-label="Atrás">‹</button>
+      <button class="icono-plano" onclick="location.hash='#/buscar'" aria-label="Buscar"><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
     </div>
     <div id="cabecera-capitulo" style="display:flex;gap:.8em;align-items:center;padding-bottom:.9em"></div>
     <div id="lista-capitulo"></div>
@@ -266,20 +282,20 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   <!-- LEER -->
   <section class="pantalla" id="p-leer">
     <div class="lect-top">
-      <button class="icono-plano" onclick="history.back()">‹</button>
-      <button class="icono-plano" onclick="abrirHojaLectura()">Aa</button>
+      <button class="icono-plano" onclick="volver()" aria-label="Atrás">‹</button>
+      <button class="icono-plano" onclick="abrirHojaLectura()" aria-label="Ajustes de lectura">Aa</button>
     </div>
     <div class="oracion">
       <div class="rail lectura" id="rail-lectura"></div>
-      <div class="cuerpo" id="cuerpo-lectura"></div>
+      <div class="cuerpo seleccionable" id="cuerpo-lectura"></div>
     </div>
     <div class="acciones">
-      <button class="icono-plano" id="accion-favorito" onclick="alternarFavoritoActual()">♡</button>
-      <button class="icono-plano" onclick="abrirHojaCompartir()">⤴</button>
-      <button class="icono-plano" id="accion-pantalla" onclick="alternarWakeLockDesdeAcciones()">◔</button>
+      <button class="icono-plano" id="accion-favorito" onclick="alternarFavoritoActual()" aria-label="Guardar">♡</button>
+      <button class="icono-plano" onclick="abrirHojaCompartir()" aria-label="Compartir">⤴</button>
+      <button class="icono-plano" id="accion-pantalla" onclick="alternarWakeLock()" aria-label="Pantalla siempre encendida">◔</button>
       <span class="par-nav">
-        <button class="icono-plano" onclick="irVecino(-1)">‹</button>
-        <button class="icono-plano" onclick="irVecino(1)">›</button>
+        <button class="icono-plano" onclick="irVecino(-1)" aria-label="Anterior">‹</button>
+        <button class="icono-plano" onclick="irVecino(1)" aria-label="Siguiente">›</button>
       </span>
     </div>
   </section>
@@ -292,14 +308,14 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
   <!-- OBRA -->
   <section class="pantalla" id="p-obra">
-    <div class="lect-top"><button class="icono-plano" onclick="history.back()">‹</button><span></span></div>
+    <div class="lect-top"><button class="icono-plano" onclick="volver()" aria-label="Atrás">‹</button><span></span></div>
     <div class="autor">
       <div class="n">Ignacio del Rey</div>
       <div class="r">Párroco de San Miguel Arcángel<br>y San Francisco de Asís · Morón de la Frontera</div>
     </div>
     <div style="display:flex;gap:1em">
       <div class="rail" style="width:.3em"></div>
-      <div class="prosa">
+      <div class="prosa seleccionable">
         <p>[Aquí va la presentación del autor tal como abre el libro.]</p>
         <p>Un devocionario para rezar con la vida, nacido del silencio, de la herida y de la esperanza.</p>
       </div>
@@ -314,20 +330,32 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
     <div class="bloque-tit" style="margin-top:1em">Lectura</div>
     <button class="fila" style="width:100%" onclick="ciclarTamano()"><div>Tamaño de letra</div><div class="v" id="valor-tamano"></div></button>
     <button class="fila" style="width:100%" onclick="ciclarTema()"><div>Tema</div><div class="v" id="valor-tema"></div></button>
-    <button class="fila" style="width:100%" onclick="alternarWakeLockDesdeAjustes()"><div>Pantalla siempre encendida</div><div class="sw" id="switch-wakelock"></div></button>
+    <button class="fila" style="width:100%" onclick="alternarWakeLock()"><div>Pantalla siempre encendida</div><div class="sw" id="switch-wakelock"></div></button>
 
     <div class="bloque-tit">Tus cosas</div>
     <button class="fila" style="width:100%" onclick="exportarGuardadas()"><div>Exportar guardadas</div><div class="v">›</div></button>
+    <button class="fila" style="width:100%" onclick="pedirImportar()"><div>Importar guardadas</div><div class="v">›</div></button>
     <button class="fila" style="width:100%" onclick="borrarHistorial()"><div>Borrar historial de búsqueda</div><div class="v">›</div></button>
 
     <div class="bloque-tit">La obra</div>
     <button class="fila" style="width:100%" onclick="location.hash='#/obra'"><div>Sobre el libro y el autor</div><div class="v">›</div></button>
     <button class="fila" style="width:100%" onclick="comprarLibro()"><div>Comprar el libro</div><div class="v">›</div></button>
 
-    <div class="bloque-tit">Desarrollo — solo build de prueba</div>
-    <button class="fila" style="width:100%" onclick="reimportarContenido()"><div>Reimportar oraciones.json</div><div class="v">↻</div></button>
+    <div class="bloque-tit">Contenido</div>
+    <div class="fila"><div>Versión del contenido</div><div class="v" id="valor-version-datos">—</div></div>
+    <button class="fila" style="width:100%" onclick="reimportarContenido()"><div>Buscar contenido nuevo</div><div class="v">↻</div></button>
 
     <div class="pie">Dios sabe más · Ignacio del Rey<br>Todos los textos son del autor y se usan con su permiso.<br>La app no guarda nada fuera de tu móvil.<br><span id="version-app" style="letter-spacing:.18em"></span></div>
+  </section>
+
+  <!-- ERROR / SIN DATOS -->
+  <section class="pantalla" id="p-error">
+    <div class="vacio">
+      <div class="ico">⚠</div>
+      <div class="t">No se pudo cargar el contenido</div>
+      <div class="d" id="detalle-error">Hace falta conexión la primera vez que abres la app, para descargar las oraciones. Después ya funciona sin cobertura.</div>
+      <div style="width:100%;max-width:320px"><button class="boton" style="width:100%" onclick="reintentarCarga()">Reintentar</button></div>
+    </div>
   </section>
 
   <nav class="navbar" id="navbar">
@@ -351,20 +379,20 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   <div class="asa"></div>
   <h3 id="titulo-hoja-compartir">Compartir</h3>
   <button class="fila" style="width:100%;border-top:1px solid var(--linea)" onclick="copiarTexto()"><div class="barrita"></div><div>Copiar el texto</div></button>
-  <button class="fila" style="width:100%" onclick="compartirWhatsApp()"><div class="barrita"></div><div>Enviar por WhatsApp</div></button>
-  <button class="fila" style="width:100%;border-bottom:none" onclick="copiarEnlace()"><div class="barrita"></div><div>Enlace a la app</div></button>
+  <button class="fila" style="width:100%" onclick="compartirSistema()"><div class="barrita"></div><div>Compartir…</div></button>
+  <button class="fila" style="width:100%;border-bottom:none" onclick="copiarEnlace()"><div class="barrita"></div><div>Copiar enlace a esta oración</div></button>
   <div class="pie" style="padding-bottom:.2em">Se envía siempre con el título del libro y el autor.</div>
 </div>
 
 <div class="overlay-entrada" id="overlay-entrada" hidden>
   <div class="paso-entrada" id="paso-bienvenida">
     <div style="font-family:'Sacramento',cursive;font-size:1.8em;max-width:16ch;margin:0 auto .5em;line-height:1.2">Detrás de casi todo lo que vivimos hay una oración</div>
-    <div style="font-size:.9em;opacity:.85;max-width:30ch;margin:0 auto 1.6em;line-height:1.6">Las 300 del libro, buscables por lo que te está pasando. Sin conexión y sin cuenta.</div>
+    <div style="font-size:.9em;opacity:.9;max-width:30ch;margin:0 auto 1.6em;line-height:1.6">Las 300 del libro, buscables por lo que te está pasando. Sin conexión y sin cuenta.</div>
     <div class="rail" style="height:2.4em;margin:0 auto 1.6em;background:var(--crema)"></div>
     <button class="boton" style="width:100%;max-width:320px;background:var(--crema);color:var(--tinta-honda)" onclick="pasoEntrada('instalar')">Empezar</button>
   </div>
   <div class="paso-entrada" id="paso-instalar" style="display:none">
-    <div style="font-size:1.1em;letter-spacing:.26em;text-transform:uppercase;opacity:.85;margin-bottom:1em">Tenerla a mano</div>
+    <div style="font-size:1.1em;letter-spacing:.26em;text-transform:uppercase;opacity:.9;margin-bottom:1em">Tenerla a mano</div>
     <p style="max-width:30ch;margin:0 auto 1.2em;font-size:.9em;line-height:1.6">Para que se abra como una app y funcione sin cobertura, añádela a la pantalla de inicio.</p>
     <div style="text-align:left;max-width:320px;margin:0 auto;width:100%">
       <div class="fila" style="border-color:rgba(239,226,198,.25)"><div class="barrita" style="background:var(--crema)"></div><div>Toca Compartir ⤴</div></div>
@@ -380,6 +408,13 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 <div class="aviso" id="aviso"></div>
 
+<div class="banner" id="banner-version">
+  <div class="txt">Hay una versión nueva de la app.</div>
+  <button onclick="aplicarActualizacion()">Actualizar</button>
+</div>
+
+<input type="file" id="fichero-importar" accept="application/json,.json" style="display:none" onchange="importarGuardadas(this)">
+
 <script>
 'use strict';
 
@@ -389,10 +424,9 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
    IndexedDB, service worker aparte (sw.js).
    ============================================================ */
 
-// Se muestra al fondo de Ajustes. Súbela a mano en cada cambio que se
-// despliegue: es la forma de comprobar desde el móvil si ya ha llegado la
-// versión nueva o se está viendo una copia cacheada.
-const VERSION_APP = 'v4 · 23 ago 2026';
+// Súbela a mano en cada despliegue: es lo que permite comprobar desde el
+// móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
+const VERSION_APP = 'v5 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -408,26 +442,27 @@ const TAMANOS = [
 // consta ISBN/tienda). Pon aquí la URL o un mailto: cuando exista.
 const ENLACE_COMPRA = '';
 
-// De dónde se cargan las oraciones. En local (iniciar-servidor.bat) se lee
-// el fichero del propio directorio. En https://agusmltkd.github.io/dios-sabe-mas/
-// el contenido NUNCA está en el repo: se pide a un worker de Cloudflare
-// aparte — ver worker/README.md. `npx wrangler deploy` (paso 4 de ese
-// README) imprime la URL exacta; solo falta pegarla aquí, el subdominio lo
-// asigna Cloudflare y no se puede adivinar de antemano.
+// De dónde se cargan las oraciones. Lista explícita de hosts que sirven la
+// app SIN el fichero al lado (GitHub Pages): ahí hay que ir al worker. Todo
+// lo demás — localhost, 127.0.0.1 y la IP de red local al probar desde el
+// móvil con iniciar-servidor.bat — sirve el fichero del propio directorio.
 const WORKER_ORACIONES_URL = 'https://dios-sabe-mas.mayoragustin01.workers.dev/oraciones.json';
-const FUENTE_ORACIONES = location.hostname.endsWith('github.io')
+const HOSTS_REMOTOS = ['agusmltkd.github.io'];
+const FUENTE_ORACIONES = HOSTS_REMOTOS.includes(location.hostname)
   ? WORKER_ORACIONES_URL
   : 'oraciones.json';
 
-let ORACIONES = [];               // array de oraciones cargadas en memoria
+let ORACIONES = [];               // oraciones en memoria, en orden de libro
+let META = { version: null, fecha: null };
 let GUARDADAS = new Map();        // n -> fecha ISO de guardado
 let CONFIG = {
   tema: 'auto', tamano: 'mediano', wakeLock: false,
-  onboardingVisto: false, ultimaLeida: null, historial: [],
+  onboardingVisto: false, ultimaLeida: null, historial: [], recientes: [],
 };
-let ACTUAL_N = null;              // oración que se está leyendo ahora mismo
+let ACTUAL_N = null;
 let wakeLockRef = null;
 let deferredInstallPrompt = null;
+let swEnEspera = null;
 
 // -------------------------- utilidades --------------------------
 
@@ -436,16 +471,14 @@ function esc(s) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
 }
-function escAttr(s) { return esc(s); }
+function escAttr(s) { return esc(s).replace(/\n/g, ' '); }
 
-// Marcas diacríticas (acentos, virgulillas...) que deja NFD al descomponer
-// una letra como 'á' en 'a' + acento. \p{Diacritic} evita tener que escribir
-// el rango Unicode a mano en el código fuente.
+// Marcas diacríticas que deja NFD al descomponer 'á' en 'a' + acento.
 const MARCAS_COMBINANTES = new RegExp('\\p{Diacritic}', 'gu');
 
 // Misma regla que normalizar() en digitalizar.py: minúsculas, sin tildes,
-// sin puntuación. Así una búsqueda en la app encaja con el campo
-// "busqueda" que ya trae precalculado cada oración.
+// sin puntuación. Así una búsqueda encaja con el campo "busqueda" que ya
+// trae precalculado cada oración.
 function normalizarJS(s) {
   const minus = String(s || '').toLowerCase();
   const sinMarcas = Array.from(minus)
@@ -454,24 +487,38 @@ function normalizarJS(s) {
   return sinMarcas.replace(/[^a-z0-9ñ ]+/g, ' ').trim();
 }
 
-// Como normalizarJS, pero además recuerda de qué índice del texto original
-// viene cada carácter normalizado. Sirve solo para recortar el fragmento
-// resaltado en los resultados de búsqueda, sobre el texto CON tildes.
+// Como normalizarJS, pero recuerda de qué índice del texto original viene
+// cada carácter. Solo para recortar el fragmento resaltado sobre el texto
+// CON tildes en los resultados de búsqueda.
 function normalizarConMapa(s) {
   const chars = Array.from(String(s || ''));
   let normalizado = '';
   const mapa = [];
   for (let i = 0; i < chars.length; i++) {
     const base = chars[i].toLowerCase().normalize('NFD').replace(MARCAS_COMBINANTES, '');
-    if (/^[a-z0-9ñ]$/.test(base)) {
-      normalizado += base; mapa.push(i);
-    } else if (!normalizado.endsWith(' ')) {
-      normalizado += ' '; mapa.push(i);
-    }
+    if (/^[a-z0-9ñ]$/.test(base)) { normalizado += base; mapa.push(i); }
+    else if (!normalizado.endsWith(' ')) { normalizado += ' '; mapa.push(i); }
   }
   while (normalizado.startsWith(' ')) { normalizado = normalizado.slice(1); mapa.shift(); }
   while (normalizado.endsWith(' ')) { normalizado = normalizado.slice(0, -1); mapa.pop(); }
   return { normalizado, mapa };
+}
+
+// ¿Se parecen lo bastante como para ser la misma palabra con una errata?
+// Distancia de edición <= 1 (una letra cambiada, sobrante o que falta).
+function distanciaMaxUno(a, b) {
+  if (a === b) return true;
+  const la = a.length, lb = b.length;
+  if (Math.abs(la - lb) > 1) return false;
+  let i = 0, j = 0, fallos = 0;
+  while (i < la && j < lb) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++fallos > 1) return false;
+    if (la > lb) i++;
+    else if (lb > la) j++;
+    else { i++; j++; }
+  }
+  return fallos + (la - i) + (lb - j) <= 1;
 }
 
 function recorta(t, n = 90) {
@@ -487,12 +534,11 @@ function fragmentoConMarca(oracion, qNorm) {
     if (idx === -1) continue;
     const desde = mapa[idx];
     const hasta = mapa[Math.min(idx + qNorm.length - 1, mapa.length - 1)] + 1;
-    const inicioVentana = Math.max(0, desde - 28);
-    const finVentana = Math.min(p.length, hasta + 28);
-    const pre = (inicioVentana > 0 ? '…' : '') + esc(p.slice(inicioVentana, desde));
-    const marca = '<mark>' + esc(p.slice(desde, hasta)) + '</mark>';
-    const post = esc(p.slice(hasta, finVentana)) + (finVentana < p.length ? '…' : '');
-    return pre + marca + post;
+    const ini = Math.max(0, desde - 28);
+    const fin = Math.min(p.length, hasta + 28);
+    return (ini > 0 ? '…' : '') + esc(p.slice(ini, desde)) +
+           '<mark>' + esc(p.slice(desde, hasta)) + '</mark>' +
+           esc(p.slice(hasta, fin)) + (fin < p.length ? '…' : '');
   }
   return oracion.parrafos[0] ? recorta(oracion.parrafos[0]) : '';
 }
@@ -505,14 +551,15 @@ function formatearFecha(iso) {
 let _avisoTimer = null;
 function mostrarAviso(texto) {
   const el = document.getElementById('aviso');
+  if (!el) return;
   el.textContent = texto;
   el.classList.add('mostrar');
   clearTimeout(_avisoTimer);
-  _avisoTimer = setTimeout(() => el.classList.remove('mostrar'), 2200);
+  _avisoTimer = setTimeout(() => el.classList.remove('mostrar'), 2600);
 }
 
-function descargarTexto(nombre, texto) {
-  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+function descargarFichero(nombre, texto, tipo) {
+  const blob = new Blob([texto], { type: (tipo || 'text/plain') + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = nombre;
@@ -520,10 +567,10 @@ function descargarTexto(nombre, texto) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-// -------------------------- base de datos local (IndexedDB) --------------------------
+// -------------------------- base de datos local --------------------------
 
 const DB_NOMBRE = 'dios-sabe-mas';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let _db = null;
 
 function abrirDB() {
@@ -537,6 +584,7 @@ function abrirDB() {
     };
     peticion.onsuccess = () => resolve(peticion.result);
     peticion.onerror = () => reject(peticion.error);
+    peticion.onblocked = () => reject(new Error('base de datos bloqueada por otra pestaña'));
   });
 }
 async function db() { return _db || (_db = await abrirDB()); }
@@ -545,17 +593,15 @@ async function idbReq(nombre, modo, fn) {
   const base = await db();
   return new Promise((resolve, reject) => {
     const t = base.transaction(nombre, modo);
-    const almacen = t.objectStore(nombre);
-    const peticion = fn(almacen);
+    const peticion = fn(t.objectStore(nombre));
     peticion.onsuccess = () => resolve(peticion.result);
     peticion.onerror = () => reject(peticion.error);
   });
 }
-const dbGet = (store, key) => idbReq(store, 'readonly', a => a.get(key));
-const dbGetAll = (store) => idbReq(store, 'readonly', a => a.getAll());
-const dbPut = (store, valor) => idbReq(store, 'readwrite', a => a.put(valor));
-const dbDelete = (store, key) => idbReq(store, 'readwrite', a => a.delete(key));
-const dbCount = (store) => idbReq(store, 'readonly', a => a.count());
+const dbGet = (s, k) => idbReq(s, 'readonly', a => a.get(k));
+const dbGetAll = (s) => idbReq(s, 'readonly', a => a.getAll());
+const dbPut = (s, v) => idbReq(s, 'readwrite', a => a.put(v));
+const dbDelete = (s, k) => idbReq(s, 'readwrite', a => a.delete(k));
 
 async function dbPutTodos(store, valores) {
   const base = await db();
@@ -577,18 +623,75 @@ async function dbClear(store) {
   });
 }
 
-async function confGet(porDefecto) {
-  const fila = await dbGet('config', 'app');
-  return fila ? Object.assign({}, porDefecto, fila.valor) : porDefecto;
+function guardarConfig() {
+  return dbPut('config', { clave: 'app', valor: CONFIG }).catch(e => console.error(e));
 }
-function guardarConfig() { return dbPut('config', { clave: 'app', valor: CONFIG }); }
+function guardarMeta() {
+  return dbPut('config', { clave: 'meta', valor: META }).catch(e => console.error(e));
+}
 
-async function importarOracionesDesdeJSON(forzarRed) {
-  const resp = await fetch(FUENTE_ORACIONES, forzarRed ? { cache: 'reload' } : {});
-  if (!resp.ok) throw new Error('No se pudo leer ' + FUENTE_ORACIONES + ' (' + resp.status + ')');
-  const datos = await resp.json();
-  await dbPutTodos('oraciones', datos);
+// -------------------------- contenido --------------------------
+
+// Acepta las dos formas: el array pelado de la primera versión, y el objeto
+// {version, fecha, oraciones} que traen ya generar_prueba.py y digitalizar.py.
+function normalizarPayload(datos) {
+  if (Array.isArray(datos)) return { version: null, fecha: null, oraciones: datos };
+  return {
+    version: datos.version ?? null,
+    fecha: datos.fecha ?? null,
+    oraciones: Array.isArray(datos.oraciones) ? datos.oraciones : [],
+  };
 }
+
+async function descargarContenido(forzarRed) {
+  const resp = await fetch(FUENTE_ORACIONES, forzarRed ? { cache: 'reload' } : {});
+  if (!resp.ok) throw new Error('respuesta ' + resp.status);
+  return normalizarPayload(await resp.json());
+}
+
+async function guardarContenido(payload) {
+  if (!payload.oraciones.length) throw new Error('el contenido venía vacío');
+  await dbClear('oraciones');
+  await dbPutTodos('oraciones', payload.oraciones);
+  META = { version: payload.version, fecha: payload.fecha };
+  await guardarMeta();
+  ORACIONES = ordenarPorLibro(payload.oraciones);
+}
+
+// Orden de lectura del libro: por capítulo (según su primera página) y
+// dentro de cada capítulo por número. No vale ordenar solo por "n": los
+// números no van correlativos con los capítulos.
+function ordenarPorLibro(lista) {
+  const primeraPagina = {};
+  lista.forEach(o => {
+    const c = o.capitulo || 'zzz';
+    const p = o.pagina ?? 99999;
+    if (primeraPagina[c] === undefined || p < primeraPagina[c]) primeraPagina[c] = p;
+  });
+  return lista.slice().sort((a, b) => {
+    const ca = primeraPagina[a.capitulo || 'zzz'], cb = primeraPagina[b.capitulo || 'zzz'];
+    if (ca !== cb) return ca - cb;                       // capítulo por capítulo
+    const pa = a.pagina ?? 99999, pb = b.pagina ?? 99999;
+    if (pa !== pb) return pa - pb;                       // y dentro, por página
+    return a.n - b.n;                                    // desempate por número
+  });
+}
+
+// stale-while-revalidate: pinta ya con lo que hay en IndexedDB y en paralelo
+// pregunta si el contenido cambió. Así la app abre al instante aunque el
+// worker esté caído o lento.
+async function revalidarContenido() {
+  let payload;
+  try { payload = await descargarContenido(true); }
+  catch (e) { return; }                    // sin red: seguimos con lo local
+  if (META.version && payload.version && META.version === payload.version) return;
+  if (!payload.oraciones.length) return;
+  await guardarContenido(payload);
+  render();
+  mostrarAviso('Contenido actualizado');
+}
+
+// -------------------------- guardadas --------------------------
 
 async function alternarGuardada(n) {
   if (GUARDADAS.has(n)) {
@@ -603,38 +706,103 @@ async function alternarGuardada(n) {
 // -------------------------- arranque --------------------------
 
 async function arrancar() {
-  registrarSW();
+  // 1. Config y tema primero, y PINTAR YA. Si la carga de contenido falla,
+  //    la app se ve igualmente (antes se quedaba en blanco).
   try {
-    await cargarOraciones();
-  } catch (e) {
-    console.error(e);
-    mostrarAviso('No se pudo cargar el contenido: ' + e.message);
-  }
-  CONFIG = await confGet(CONFIG);
+    const fila = await dbGet('config', 'app');
+    if (fila) CONFIG = Object.assign({}, CONFIG, fila.valor);
+    const filaMeta = await dbGet('config', 'meta');
+    if (filaMeta) META = Object.assign({}, META, filaMeta.valor);
+  } catch (e) { console.error('config:', e); }
+
   aplicarTema();
   aplicarTamano();
-  if (CONFIG.wakeLock) await activarWakeLock();
   window.addEventListener('hashchange', render);
+
+  // 2. Contenido: primero lo local, y si no hay, se descarga.
+  let hayDatos = false;
+  try {
+    const locales = await dbGetAll('oraciones');
+    if (locales.length) { ORACIONES = ordenarPorLibro(locales); hayDatos = true; }
+    const favs = await dbGetAll('guardadas');
+    GUARDADAS = new Map(favs.map(f => [f.n, f.fecha]));
+  } catch (e) { console.error('lectura local:', e); }
+
+  if (hayDatos) {
+    render();
+    revalidarContenido();                  // en segundo plano
+  } else {
+    try {
+      await guardarContenido(await descargarContenido(false));
+      render();
+    } catch (e) {
+      console.error('descarga:', e);
+      mostrarError(e);
+      return;
+    }
+  }
+
   if (!CONFIG.onboardingVisto) mostrarEntrada();
-  render();
+  if (CONFIG.wakeLock) activarWakeLock();
+  pedirPersistencia();
 }
 
-async function cargarOraciones() {
-  const n = await dbCount('oraciones');
-  if (n === 0) await importarOracionesDesdeJSON();
-  ORACIONES = (await dbGetAll('oraciones')).sort((a, b) => a.n - b.n);
-  const favs = await dbGetAll('guardadas');
-  GUARDADAS = new Map(favs.map(f => [f.n, f.fecha]));
+function mostrarError(e) {
+  const detalle = document.getElementById('detalle-error');
+  if (detalle && e) {
+    detalle.textContent = navigator.onLine
+      ? 'No se pudo descargar el contenido (' + (e.message || e) + '). Vuelve a intentarlo en un momento.'
+      : 'Estás sin conexión. Hace falta red la primera vez que abres la app, para descargar las oraciones. Después ya funciona sin cobertura.';
+  }
+  mostrarPantalla('p-error', null);
 }
+
+async function reintentarCarga() {
+  mostrarAviso('Reintentando…');
+  try {
+    await guardarContenido(await descargarContenido(true));
+    render();
+  } catch (e) {
+    mostrarError(e);
+  }
+}
+
+// Safari borra IndexedDB de sitios sin uso a los 7 días. Instalada en la
+// pantalla de inicio se salva, pero pedir persistencia no cuesta nada.
+async function pedirPersistencia() {
+  try {
+    if (navigator.storage && navigator.storage.persist) {
+      const ya = await navigator.storage.persisted();
+      if (!ya) await navigator.storage.persist();
+    }
+  } catch (e) {}
+}
+
+// -------------------------- service worker --------------------------
 
 function registrarSW() {
   if (!('serviceWorker' in navigator)) return;
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
-    .then(reg => reg.update().catch(() => {}))
+    .then(reg => {
+      if (reg.waiting) avisarVersionNueva(reg.waiting);
+      reg.addEventListener('updatefound', () => {
+        const nuevo = reg.installing;
+        if (!nuevo) return;
+        nuevo.addEventListener('statechange', () => {
+          // hay uno esperando Y ya había uno controlando: es una
+          // actualización, no la primera instalación
+          if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
+            avisarVersionNueva(nuevo);
+          }
+        });
+      });
+      reg.update().catch(() => {});
+    })
     .catch(() => {});
 
-  // cuando el service worker nuevo toma el control, recarga una vez para
-  // que se vea la versión nueva sin tener que reinstalar la app a mano
+  // Para una app de lectura no se recarga sola: cambiarle el HTML bajo los
+  // pies a quien está rezando es peor que esperar. Solo se recarga cuando
+  // la persona toca "Actualizar".
   let recargando = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (recargando) return;
@@ -643,46 +811,56 @@ function registrarSW() {
   });
 }
 
+function avisarVersionNueva(worker) {
+  swEnEspera = worker;
+  const b = document.getElementById('banner-version');
+  if (b) b.classList.add('mostrar');
+}
+
+function aplicarActualizacion() {
+  const b = document.getElementById('banner-version');
+  if (b) b.classList.remove('mostrar');
+  if (swEnEspera) swEnEspera.postMessage({ tipo: 'SALTAR_ESPERA' });
+  else location.reload();
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('campo-buscar').addEventListener('input', e => {
-    const q = e.target.value;
-    history.replaceState(null, '', location.pathname + '#/buscar' + (q ? ('?q=' + encodeURIComponent(q)) : ''));
-    renderizarBuscar(q);
-  });
-  document.getElementById('p-leer').addEventListener('scroll', actualizarProgreso);
-  arrancar();
-});
 // -------------------------- router --------------------------
 
 function parseHash() {
   const h = location.hash.replace(/^#\/?/, '');
-  const [rutaCompleta, qs] = h.split('?');
-  const partes = rutaCompleta.split('/').filter(Boolean);
-  const ruta = partes.shift() || '';
-  return { ruta, partes, query: new URLSearchParams(qs || '') };
+  const [ruta, qs] = h.split('?');
+  const partes = ruta.split('/').filter(Boolean);
+  return { ruta: partes.shift() || '', partes, query: new URLSearchParams(qs || '') };
 }
 
 function render() {
   const { ruta, partes, query } = parseHash();
-  if (ruta === '' || ruta === 'hoy') return pantallaHoy();
-  if (ruta === 'buscar') return pantallaBuscar(query.get('q') || '');
-  if (ruta === 'indice' && partes.length === 0) return pantallaIndice();
-  if (ruta === 'indice' && partes.length === 1) return pantallaCapitulo(decodeURIComponent(partes[0]));
-  if (ruta === 'leer' && partes.length === 1) return pantallaLeer(Number(partes[0]));
-  if (ruta === 'guardadas') return pantallaGuardadas();
-  if (ruta === 'obra') return pantallaObra();
-  if (ruta === 'ajustes') return pantallaAjustes();
-  return pantallaHoy();
+  try {
+    if (ruta === '' || ruta === 'hoy') return pantallaHoy();
+    if (ruta === 'buscar') return pantallaBuscar(query.get('q') || '');
+    if (ruta === 'indice' && partes.length === 0) return pantallaIndice();
+    if (ruta === 'indice') return pantallaCapitulo(decodeURIComponent(partes[0]));
+    // 'o' es el enlace corto para compartir; 'leer' el interno de siempre
+    if ((ruta === 'leer' || ruta === 'o') && partes.length === 1) return pantallaLeer(Number(partes[0]));
+    if (ruta === 'guardadas') return pantallaGuardadas();
+    if (ruta === 'obra') return pantallaObra();
+    if (ruta === 'ajustes') return pantallaAjustes();
+    return pantallaHoy();
+  } catch (e) {
+    console.error('render:', e);
+    mostrarError(e);
+  }
 }
 
 function mostrarPantalla(id, rutaNav) {
   document.querySelectorAll('.pantalla').forEach(s => s.classList.remove('mostrar'));
-  document.getElementById(id).classList.add('mostrar');
+  const el = document.getElementById(id);
+  if (el) el.classList.add('mostrar');
   const navbar = document.getElementById('navbar');
   if (rutaNav) {
     navbar.style.display = '';
@@ -693,16 +871,25 @@ function mostrarPantalla(id, rutaNav) {
   cerrarHojas();
 }
 
-// -------------------------- tema y tamaño de letra --------------------------
+// Si hay historial propio, atrás; si se entró directo por un enlace
+// compartido, a Hoy (en vez de salirse de la app).
+function volver() {
+  if (history.length > 1) history.back();
+  else location.hash = '#/hoy';
+}
+
+// -------------------------- tema y tamaño --------------------------
 
 function aplicarTema() {
   const resuelto = CONFIG.tema === 'auto'
     ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'noche' : 'dia')
     : CONFIG.tema;
   document.documentElement.setAttribute('data-tema', resuelto);
-  const meta = document.querySelector('meta[name=theme-color]');
-  if (meta) meta.setAttribute('content', resuelto === 'noche' ? '#294351' : '#3E5A67');
-  // copia síncrona para el script de arranque en <head> (evita el parpadeo)
+  document.querySelectorAll('meta[name=theme-color]').forEach(m => m.remove());
+  const meta = document.createElement('meta');
+  meta.name = 'theme-color';
+  meta.content = resuelto === 'noche' ? '#294351' : '#3E5A67';
+  document.head.appendChild(meta);
   try { localStorage.setItem('tema', CONFIG.tema); } catch (e) {}
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
@@ -713,21 +900,20 @@ function aplicarTamano() {
   const t = TAMANOS.find(t => t.clave === CONFIG.tamano) || TAMANOS[1];
   document.documentElement.style.setProperty('--tam', t.mult);
 }
-
 function ciclarTema() {
   const orden = ['auto', 'dia', 'noche'];
   CONFIG.tema = orden[(orden.indexOf(CONFIG.tema) + 1) % orden.length];
   aplicarTema(); guardarConfig(); pantallaAjustes();
 }
 function ciclarTamano() {
-  const idx = TAMANOS.findIndex(t => t.clave === CONFIG.tamano);
-  CONFIG.tamano = TAMANOS[(idx + 1) % TAMANOS.length].clave;
+  const i = TAMANOS.findIndex(t => t.clave === CONFIG.tamano);
+  CONFIG.tamano = TAMANOS[(i + 1) % TAMANOS.length].clave;
   aplicarTamano(); guardarConfig(); pantallaAjustes();
 }
-function elegirTamano(clave) { CONFIG.tamano = clave; aplicarTamano(); guardarConfig(); abrirHojaLectura(); }
-function elegirTema(clave) { CONFIG.tema = clave; aplicarTema(); guardarConfig(); abrirHojaLectura(); }
+function elegirTamano(c) { CONFIG.tamano = c; aplicarTamano(); guardarConfig(); abrirHojaLectura(); }
+function elegirTema(c) { CONFIG.tema = c; aplicarTema(); guardarConfig(); abrirHojaLectura(); }
 
-// -------------------------- hojas inferiores --------------------------
+// -------------------------- hojas --------------------------
 
 function abrirHoja(id) {
   document.getElementById('velo').classList.add('mostrar');
@@ -737,15 +923,12 @@ function cerrarHojas() {
   document.getElementById('velo').classList.remove('mostrar');
   document.querySelectorAll('.hoja').forEach(h => h.classList.remove('mostrar'));
 }
-
 function abrirHojaLectura() {
   document.getElementById('tamanos-hoja').innerHTML = TAMANOS.map((t, i) =>
-    `<button class="${t.clave === CONFIG.tamano ? 'on' : ''}" style="font-size:${0.85 + i * 0.25}em" onclick="elegirTamano('${t.clave}')">A</button>`
+    `<button class="${t.clave === CONFIG.tamano ? 'on' : ''}" style="font-size:${0.85 + i * 0.25}em" onclick="elegirTamano('${t.clave}')" aria-label="${escAttr(t.etiqueta)}">A</button>`
   ).join('');
-  const OPCIONES_TEMA = [
-    { c: 'dia', i: '☀', e: 'Día' }, { c: 'noche', i: '☾', e: 'Noche' }, { c: 'auto', i: '⌁', e: 'Auto' },
-  ];
-  document.getElementById('opciones-tema').innerHTML = OPCIONES_TEMA.map(o =>
+  const OPC = [{ c: 'dia', i: '☀', e: 'Día' }, { c: 'noche', i: '☾', e: 'Noche' }, { c: 'auto', i: '⌁', e: 'Auto' }];
+  document.getElementById('opciones-tema').innerHTML = OPC.map(o =>
     `<button class="opcion${CONFIG.tema === o.c ? ' on' : ''}" onclick="elegirTema('${o.c}')"><i>${o.i}</i>${o.e}</button>`
   ).join('');
   abrirHoja('hoja-lectura');
@@ -753,25 +936,56 @@ function abrirHojaLectura() {
 
 // -------------------------- pantalla: hoy --------------------------
 
+// Oración del día: determinista a partir de la fecha, sin servidor. Es lo
+// que sí se puede hacer, ya que una PWA en iOS no puede lanzar una
+// notificación diaria por su cuenta.
+function hashCadena(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function oracionDelDia() {
+  if (!ORACIONES.length) return null;
+  const d = new Date();
+  const clave = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  return ORACIONES[hashCadena(clave) % ORACIONES.length];
+}
+
+function tarjeta(o, etiqueta) {
+  return `<button class="tarjeta" style="width:100%" onclick="location.hash='#/leer/${o.n}'">
+      <div class="rail"></div>
+      <div>${etiqueta ? `<div style="font-size:.72em;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-secundaria)">${esc(etiqueta)}</div>` : ''}
+      <div class="num">${o.n}</div><div class="tit">${esc(o.titulo)}</div></div>
+    </button>`;
+}
+
 function pantallaHoy() {
   mostrarPantalla('p-hoy', 'hoy');
   document.getElementById('chips-hoy').innerHTML = CHIPS_HOY.map(t =>
     `<button class="chip" onclick="irABuscarCon('${escAttr(t)}')">${esc(t)}</button>`).join('');
 
-  const cont = document.getElementById('seguias-aqui');
+  const dia = oracionDelDia();
+  document.getElementById('bloque-dia').innerHTML = dia
+    ? `<div class="bloque-tit">La de hoy</div>${tarjeta(dia)}` : '';
+
   const ultima = CONFIG.ultimaLeida != null ? ORACIONES.find(o => o.n === CONFIG.ultimaLeida) : null;
-  cont.innerHTML = ultima ? `
-    <div class="bloque-tit">Seguías aquí</div>
-    <button class="tarjeta" style="width:100%" onclick="location.hash='#/leer/${ultima.n}'">
-      <div class="rail"></div>
-      <div><div class="num">${ultima.n}</div><div class="tit">${esc(ultima.titulo)}</div></div>
-    </button>` : '';
+  document.getElementById('seguias-aqui').innerHTML = (ultima && (!dia || ultima.n !== dia.n))
+    ? `<div class="bloque-tit">Seguías aquí</div>${tarjeta(ultima)}` : '';
+
+  const recientes = (CONFIG.recientes || [])
+    .map(n => ORACIONES.find(o => o.n === n)).filter(Boolean)
+    .filter(o => !ultima || o.n !== ultima.n).slice(0, 5);
+  document.getElementById('recientes-hoy').innerHTML = recientes.length
+    ? `<div class="bloque-tit">Vistas hace poco</div>` + recientes.map(o => `
+        <button class="res" style="width:100%" onclick="location.hash='#/leer/${o.n}'">
+          <div class="num">${o.n}</div><div><div class="tit">${esc(o.titulo)}</div></div>
+        </button>`).join('')
+    : '';
 }
-function irABuscarCon(texto) { location.hash = '#/buscar?q=' + encodeURIComponent(texto); }
+function irABuscarCon(t) { location.hash = '#/buscar?q=' + encodeURIComponent(t); }
 function irAlAzar() {
   if (!ORACIONES.length) return;
-  const o = ORACIONES[Math.floor(Math.random() * ORACIONES.length)];
-  location.hash = '#/leer/' + o.n;
+  location.hash = '#/leer/' + ORACIONES[Math.floor(Math.random() * ORACIONES.length)].n;
 }
 
 // -------------------------- pantalla: buscar --------------------------
@@ -786,41 +1000,73 @@ function pantallaBuscar(q) {
   setTimeout(() => campo.focus(), 30);
 }
 
+function buscarOraciones(q) {
+  const qNorm = normalizarJS(q);
+  if (!qNorm) return { qNorm, resultados: [], porErrata: false };
+
+  const textoDe = o => o.busqueda || normalizarJS(o.titulo + ' ' + o.parrafos.join(' '));
+  let resultados = ORACIONES.filter(o => textoDe(o).includes(qNorm));
+
+  // tolerar una errata: si no hay nada exacto, comparar palabra a palabra
+  let porErrata = false;
+  if (!resultados.length && qNorm.length >= 4) {
+    const palabras = qNorm.split(' ').filter(p => p.length >= 4);
+    if (palabras.length) {
+      resultados = ORACIONES.filter(o => {
+        const suyas = textoDe(o).split(' ');
+        return palabras.every(p => suyas.some(s => distanciaMaxUno(p, s)));
+      });
+      porErrata = resultados.length > 0;
+    }
+  }
+  return { qNorm, resultados, porErrata };
+}
+
 function renderizarBuscar(q) {
   const cont = document.getElementById('contenido-buscar');
-  const qNorm = normalizarJS(q);
+  const texto = (q || '').trim();
 
-  if (!qNorm) {
+  if (!normalizarJS(texto)) {
     cont.innerHTML = `
       <div class="bloque-tit">Lo que más se busca</div>
       ${SUGERENCIAS_BUSQUEDA.map(s => `<button class="fila" style="width:100%" onclick="buscarTexto('${escAttr(s)}')"><div class="barrita"></div><div>${esc(s)}</div></button>`).join('')}
-      ${CONFIG.historial.length ? `
-        <div class="bloque-tit">Últimas búsquedas</div>
-        ${CONFIG.historial.map(h => `<button class="fila" style="width:100%" onclick="buscarTexto('${escAttr(h)}')"><div style="opacity:.45">↺</div><div>${esc(h)}</div></button>`).join('')}
-      ` : ''}
+      <div class="bloque-tit">Por número</div>
+      <div class="fila" style="color:var(--tinta-secundaria)"><div class="barrita"></div><div>Escribe el número de la oración, como en el libro.</div></div>
+      ${CONFIG.historial.length ? `<div class="bloque-tit">Últimas búsquedas</div>` +
+        CONFIG.historial.map(h => `<button class="fila" style="width:100%" onclick="buscarTexto('${escAttr(h)}')"><div style="opacity:.55">↺</div><div>${esc(h)}</div></button>`).join('') : ''}
     `;
     return;
   }
 
-  const resultados = ORACIONES.filter(o => (o.busqueda || normalizarJS(o.titulo + ' ' + o.parrafos.join(' '))).includes(qNorm));
+  // Entrar por número: "57" salta a la 57, que es como se habla del libro.
+  let cabecera = '';
+  if (/^\d{1,3}$/.test(texto)) {
+    const exacta = ORACIONES.find(o => o.n === Number(texto));
+    cabecera = exacta
+      ? `<div class="bloque-tit">La ${exacta.n}</div>${tarjeta(exacta)}`
+      : `<div class="bloque-tit">Por número</div><div class="fila" style="color:var(--tinta-secundaria)"><div class="barrita"></div><div>No hay ninguna oración con el número ${esc(texto)}.</div></div>`;
+  }
+
+  const { qNorm, resultados, porErrata } = buscarOraciones(texto);
 
   if (!resultados.length) {
-    cont.innerHTML = `
+    cont.innerHTML = cabecera + (cabecera ? '' : `
       <div class="vacio">
         <div class="t">Nada con esa palabra</div>
         <div class="d">Prueba con lo que sientes más que con lo que pasa.</div>
         <div class="chips" style="justify-content:center">${CHIPS_HOY.map(t => `<button class="chip" onclick="buscarTexto('${escAttr(t)}')">${esc(t)}</button>`).join('')}</div>
         <div style="width:100%;margin-top:1.4em"><button class="boton hueco" style="width:100%" onclick="location.hash='#/indice'">Ver el índice completo</button></div>
-      </div>`;
+      </div>`);
   } else {
-    cont.innerHTML = `<div class="contador">${resultados.length} oraci${resultados.length === 1 ? 'ón' : 'ones'}</div>` +
+    cont.innerHTML = cabecera +
+      `<div class="contador">${resultados.length} oraci${resultados.length === 1 ? 'ón' : 'ones'}${porErrata ? ' · buscando parecidas' : ''}</div>` +
       resultados.map(o => `
         <button class="res" style="width:100%" onclick="location.hash='#/leer/${o.n}'">
           <div class="num">${o.n}</div>
           <div><div class="tit">${esc(o.titulo)}</div><div class="frag">${fragmentoConMarca(o, qNorm)}</div></div>
         </button>`).join('');
   }
-  programarGuardarHistorial(q);
+  programarGuardarHistorial(texto);
 }
 
 function buscarTexto(t) {
@@ -830,7 +1076,7 @@ function buscarTexto(t) {
 
 function programarGuardarHistorial(q) {
   clearTimeout(_historialTimer);
-  const texto = q.trim();
+  const texto = (q || '').trim();
   if (texto.length < 3) return;
   _historialTimer = setTimeout(() => {
     CONFIG.historial = [texto, ...CONFIG.historial.filter(h => h.toLowerCase() !== texto.toLowerCase())].slice(0, 8);
@@ -848,12 +1094,8 @@ function capitulosOrdenados() {
   });
   return Object.keys(porNombre).map(nombre => {
     const entradas = porNombre[nombre].slice().sort((a, b) => a.n - b.n);
-    const paginas = entradas.map(e => e.pagina).filter(p => p != null);
-    return {
-      nombre, entradas,
-      min: paginas.length ? Math.min(...paginas) : null,
-      max: paginas.length ? Math.max(...paginas) : null,
-    };
+    const pgs = entradas.map(e => e.pagina).filter(p => p != null);
+    return { nombre, entradas, min: pgs.length ? Math.min(...pgs) : null, max: pgs.length ? Math.max(...pgs) : null };
   }).sort((a, b) => (a.min ?? Infinity) - (b.min ?? Infinity));
 }
 
@@ -861,7 +1103,7 @@ function pantallaIndice() {
   mostrarPantalla('p-indice', 'indice');
   const caps = capitulosOrdenados();
   document.getElementById('contador-indice').textContent =
-    `${ORACIONES.length} oraciones · ${caps.length} capítulos`;
+    `${ORACIONES.length} oraciones · ${caps.length} capítulo${caps.length === 1 ? '' : 's'}`;
   document.getElementById('lista-indice').innerHTML = caps.map(c => `
     <button class="grupo" style="width:100%" onclick="location.hash='#/indice/${encodeURIComponent(c.nombre)}'">
       <div class="barrita"></div><div class="g">${esc(c.nombre)}</div><div class="n">${c.entradas.length}</div>
@@ -876,7 +1118,7 @@ function pantallaCapitulo(nombre) {
     <div class="rail" style="height:2.5em"></div>
     <div>
       <div style="font-size:1.25em;letter-spacing:.06em">${esc(cap.nombre)}</div>
-      <div style="font-size:.78em;color:var(--tinta-suave)">${cap.entradas.length} oraciones${cap.min != null ? ` · p. ${cap.min}-${cap.max}` : ''}</div>
+      <div style="font-size:.78em;color:var(--tinta-secundaria)">${cap.entradas.length} oraciones${cap.min != null ? ` · p. ${cap.min}-${cap.max}` : ''}</div>
     </div>`;
   document.getElementById('lista-capitulo').innerHTML = cap.entradas.map(o => `
     <button class="res" style="width:100%" onclick="location.hash='#/leer/${o.n}'">
@@ -886,28 +1128,16 @@ function pantallaCapitulo(nombre) {
 
 // -------------------------- pantalla: leer --------------------------
 
+// Vecino en orden de LIBRO, no por número: al llegar al final de un
+// capítulo se pasa al siguiente, como al pasar la hoja.
 function vecino(n, delta) {
-  const idx = ORACIONES.findIndex(o => o.n === n);
-  if (idx === -1 || !ORACIONES.length) return null;
-  const siguiente = (idx + delta + ORACIONES.length) % ORACIONES.length;
-  return ORACIONES[siguiente];
+  const i = ORACIONES.findIndex(o => o.n === n);
+  if (i === -1 || !ORACIONES.length) return null;
+  return ORACIONES[(i + delta + ORACIONES.length) % ORACIONES.length];
 }
 function irVecino(delta) {
   const s = vecino(ACTUAL_N, delta);
   if (s) location.hash = '#/leer/' + s.n;
-}
-
-function siguienteTarjetaHTML(n) {
-  const sig = vecino(n, 1);
-  if (!sig) return '';
-  return `
-    <button class="tarjeta" style="margin-top:.4em;width:100%" onclick="location.hash='#/leer/${sig.n}'">
-      <div class="rail"></div>
-      <div>
-        <div style="font-size:.72em;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-suave)">Siguiente</div>
-        <div class="tit" style="font-size:1.15em">${esc(sig.titulo)}</div>
-      </div>
-    </button>`;
 }
 
 function pantallaLeer(n) {
@@ -915,11 +1145,14 @@ function pantallaLeer(n) {
   const o = ORACIONES.find(x => x.n === n);
   const cuerpo = document.getElementById('cuerpo-lectura');
   if (!o) {
-    cuerpo.innerHTML = '<p>No se encuentra esa oración. Puede que el número no exista todavía en el contenido de prueba.</p>';
     ACTUAL_N = null;
+    cuerpo.innerHTML = `<p>No se encuentra la oración ${esc(String(n))}.</p>
+      <p style="font-size:.85em;color:var(--tinta-secundaria)">Puede que ese número todavía no exista en el contenido cargado.</p>`;
     return;
   }
   ACTUAL_N = n;
+  const sig = vecino(n, 1);
+  const mismaSeccion = sig && sig.capitulo === o.capitulo;
   cuerpo.innerHTML = `
     <div class="num">${o.n}</div>
     <h2>${esc(o.titulo)}</h2>
@@ -927,7 +1160,7 @@ function pantallaLeer(n) {
     <div style="text-align:center;padding:1.5em 0 .8em">
       <div style="font-family:'Sacramento',cursive;font-size:1.6em">Amén</div>
     </div>
-    ${siguienteTarjetaHTML(n)}
+    ${sig ? `<div style="margin-top:.4em">${tarjeta(sig, mismaSeccion ? 'Siguiente' : 'Siguiente · ' + (sig.capitulo || ''))}</div>` : ''}
   `;
   const favBtn = document.getElementById('accion-favorito');
   const activo = GUARDADAS.has(n);
@@ -938,6 +1171,7 @@ function pantallaLeer(n) {
   document.getElementById('rail-lectura').style.setProperty('--progreso', '0%');
 
   CONFIG.ultimaLeida = n;
+  CONFIG.recientes = [n, ...(CONFIG.recientes || []).filter(x => x !== n)].slice(0, 12);
   guardarConfig();
 }
 
@@ -967,51 +1201,80 @@ function pantallaGuardadas() {
   const favs = ORACIONES.filter(o => GUARDADAS.has(o.n))
     .sort((a, b) => new Date(GUARDADAS.get(b.n)) - new Date(GUARDADAS.get(a.n)));
 
-  if (!favs.length) {
-    cont.innerHTML = `
-      <div class="vacio">
+  cont.innerHTML = favs.length
+    ? `<div class="contador">${favs.length} oraci${favs.length === 1 ? 'ón' : 'ones'}</div>` +
+      favs.map(o => `
+        <button class="res" style="width:100%" onclick="location.hash='#/leer/${o.n}'">
+          <div class="num">${o.n}</div>
+          <div><div class="tit">${esc(o.titulo)}</div><div class="frag">${formatearFecha(GUARDADAS.get(o.n))}</div></div>
+        </button>`).join('')
+    : `<div class="vacio">
         <div class="ico">♡</div>
         <div class="t">Todavía ninguna</div>
         <div class="d">Toca el corazón en cualquier oración y aparecerá aquí.</div>
         <div style="width:100%"><button class="boton hueco" style="width:100%" onclick="irAlAzar()">◈ Abrir una al azar</button></div>
       </div>`;
-    return;
-  }
-  cont.innerHTML = `<div class="contador">${favs.length} oraci${favs.length === 1 ? 'ón' : 'ones'}</div>` +
-    favs.map(o => `
-      <button class="res" style="width:100%" onclick="location.hash='#/leer/${o.n}'">
-        <div class="num">${o.n}</div>
-        <div><div class="tit">${esc(o.titulo)}</div><div class="frag">${formatearFecha(GUARDADAS.get(o.n))}</div></div>
-      </button>`).join('');
 }
 
-// -------------------------- pantalla: obra --------------------------
+// -------------------------- obra y ajustes --------------------------
 
 function pantallaObra() { mostrarPantalla('p-obra', null); }
 
 function comprarLibro() {
   if (ENLACE_COMPRA) window.open(ENLACE_COMPRA, '_blank');
-  else mostrarAviso('Falta añadir el enlace de compra (ENLACE_COMPRA en index.html)');
+  else mostrarAviso('Falta añadir el enlace de compra');
 }
-
-// -------------------------- pantalla: ajustes --------------------------
 
 function pantallaAjustes() {
   mostrarPantalla('p-ajustes', null);
-  document.getElementById('version-app').textContent = VERSION_APP;
   document.getElementById('valor-tamano').textContent =
     (TAMANOS.find(t => t.clave === CONFIG.tamano) || TAMANOS[1]).etiqueta;
   document.getElementById('valor-tema').textContent =
     ({ auto: 'Automático', dia: 'Día', noche: 'Noche' })[CONFIG.tema];
   document.getElementById('switch-wakelock').classList.toggle('off', !CONFIG.wakeLock);
+  document.getElementById('version-app').textContent = VERSION_APP;
+  document.getElementById('valor-version-datos').textContent =
+    META.version ? META.version + (META.fecha ? ' · ' + META.fecha : '') : `${ORACIONES.length} oraciones`;
 }
 
 function exportarGuardadas() {
   const favs = ORACIONES.filter(o => GUARDADAS.has(o.n)).sort((a, b) => a.n - b.n);
   if (!favs.length) { mostrarAviso('No hay guardadas que exportar'); return; }
-  const texto = favs.map(o => `${o.n}. ${o.titulo}  (guardada el ${formatearFecha(GUARDADAS.get(o.n))})`).join('\n');
-  descargarTexto('guardadas-dios-sabe-mas.txt', texto);
-  mostrarAviso('Descargando guardadas-dios-sabe-mas.txt');
+  // JSON, no texto: así se puede volver a importar en otro móvil. Sin
+  // cuentas ni sincronización, esta es la única red de seguridad.
+  const datos = {
+    app: 'dios-sabe-mas',
+    exportado: new Date().toISOString(),
+    guardadas: favs.map(o => ({ n: o.n, titulo: o.titulo, fecha: GUARDADAS.get(o.n) })),
+  };
+  descargarFichero('guardadas-dios-sabe-mas.json', JSON.stringify(datos, null, 2), 'application/json');
+  mostrarAviso('Exportadas ' + favs.length);
+}
+
+function pedirImportar() { document.getElementById('fichero-importar').click(); }
+
+async function importarGuardadas(input) {
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!f) return;
+  try {
+    const datos = JSON.parse(await f.text());
+    const lista = Array.isArray(datos) ? datos : datos.guardadas;
+    if (!Array.isArray(lista)) throw new Error('formato no reconocido');
+    let nuevas = 0;
+    for (const g of lista) {
+      const n = Number(g.n);
+      if (!Number.isFinite(n) || GUARDADAS.has(n)) continue;
+      const fecha = g.fecha || new Date().toISOString();
+      GUARDADAS.set(n, fecha);
+      await dbPut('guardadas', { n, fecha });
+      nuevas++;
+    }
+    render();
+    mostrarAviso(nuevas ? `Importadas ${nuevas}` : 'Ya estaban todas');
+  } catch (e) {
+    mostrarAviso('No se pudo importar: ' + e.message);
+  }
 }
 
 async function borrarHistorial() {
@@ -1022,59 +1285,60 @@ async function borrarHistorial() {
 }
 
 async function reimportarContenido() {
-  mostrarAviso('Reimportando…');
+  mostrarAviso('Buscando contenido nuevo…');
   try {
-    await dbClear('oraciones');
-    await importarOracionesDesdeJSON(true);
-    ORACIONES = (await dbGetAll('oraciones')).sort((a, b) => a.n - b.n);
-    mostrarAviso(ORACIONES.length + ' oraciones recargadas');
+    const payload = await descargarContenido(true);
+    if (META.version && payload.version && META.version === payload.version) {
+      mostrarAviso('Ya tienes la última versión');
+      return;
+    }
+    await guardarContenido(payload);
+    render();
+    mostrarAviso(ORACIONES.length + ' oraciones actualizadas');
   } catch (e) {
-    console.error(e);
-    mostrarAviso('No se pudo reimportar: ' + e.message);
+    mostrarAviso('No se pudo actualizar: ' + e.message);
   }
 }
 
 // -------------------------- pantalla siempre encendida --------------------------
 
 async function activarWakeLock() {
-  if (!('wakeLock' in navigator)) {
-    mostrarAviso('Pantalla siempre encendida no está disponible en este navegador');
-    return false;
-  }
+  if (!('wakeLock' in navigator)) return false;
   try {
     wakeLockRef = await navigator.wakeLock.request('screen');
     wakeLockRef.addEventListener('release', () => { wakeLockRef = null; });
     return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
+  } catch (e) { return false; }
 }
 function liberarWakeLock() {
   if (wakeLockRef) { wakeLockRef.release().catch(() => {}); wakeLockRef = null; }
 }
-async function alternarWakeLockDesdeAjustes() {
+async function alternarWakeLock() {
+  if (!('wakeLock' in navigator)) {
+    mostrarAviso('Este navegador no puede mantener la pantalla encendida');
+    return;
+  }
   CONFIG.wakeLock = !CONFIG.wakeLock;
-  if (CONFIG.wakeLock) { const ok = await activarWakeLock(); if (!ok) CONFIG.wakeLock = false; }
+  if (CONFIG.wakeLock) { if (!await activarWakeLock()) CONFIG.wakeLock = false; }
   else liberarWakeLock();
   await guardarConfig();
-  pantallaAjustes();
+  const sw = document.getElementById('switch-wakelock');
+  if (sw) sw.classList.toggle('off', !CONFIG.wakeLock);
   const accion = document.getElementById('accion-pantalla');
   if (accion) accion.classList.toggle('on', !!CONFIG.wakeLock);
+  mostrarAviso(CONFIG.wakeLock ? 'La pantalla no se apagará' : 'La pantalla vuelve a apagarse sola');
 }
-async function alternarWakeLockDesdeAcciones() {
-  await alternarWakeLockDesdeAjustes();
-}
-document.addEventListener('visibilitychange', async () => {
-  if (CONFIG.wakeLock && document.visibilityState === 'visible' && !wakeLockRef) {
-    await activarWakeLock();
-  }
+document.addEventListener('visibilitychange', () => {
+  if (CONFIG.wakeLock && document.visibilityState === 'visible' && !wakeLockRef) activarWakeLock();
 });
 
 // -------------------------- compartir --------------------------
 
 function textoParaCompartir(o) {
   return `${o.titulo}\n\n${o.parrafos.join('\n\n')}\n\n— ${TITULO_LIBRO}, ${AUTOR_LIBRO}`;
+}
+function enlaceDe(n) {
+  return location.origin + location.pathname + '#/o/' + n;
 }
 function abrirHojaCompartir() {
   const o = ORACIONES.find(x => x.n === ACTUAL_N);
@@ -1084,24 +1348,39 @@ function abrirHojaCompartir() {
 }
 async function copiarTexto() {
   const o = ORACIONES.find(x => x.n === ACTUAL_N); if (!o) return;
-  try { await navigator.clipboard.writeText(textoParaCompartir(o)); mostrarAviso('Texto copiado'); }
-  catch (e) { mostrarAviso('No se pudo copiar'); }
-  cerrarHojas();
-}
-function compartirWhatsApp() {
-  const o = ORACIONES.find(x => x.n === ACTUAL_N); if (!o) return;
-  window.open('https://wa.me/?text=' + encodeURIComponent(textoParaCompartir(o)), '_blank');
+  await copiar(textoParaCompartir(o), 'Texto copiado');
   cerrarHojas();
 }
 async function copiarEnlace() {
   if (ACTUAL_N == null) return;
-  const enlace = location.origin + location.pathname + '#/leer/' + ACTUAL_N;
-  try { await navigator.clipboard.writeText(enlace); mostrarAviso('Enlace copiado'); }
-  catch (e) { mostrarAviso('No se pudo copiar'); }
+  await copiar(enlaceDe(ACTUAL_N), 'Enlace copiado');
+  cerrarHojas();
+}
+async function copiar(texto, exito) {
+  try { await navigator.clipboard.writeText(texto); mostrarAviso(exito); }
+  catch (e) {
+    // Safari sin permiso de portapapeles: al menos deja el texto a mano
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      mostrarAviso(exito);
+    } catch (e2) { mostrarAviso('No se pudo copiar'); }
+  }
+}
+async function compartirSistema() {
+  const o = ORACIONES.find(x => x.n === ACTUAL_N); if (!o) return;
+  const texto = textoParaCompartir(o);
+  if (navigator.share) {
+    try { await navigator.share({ title: o.titulo, text: texto }); } catch (e) {}
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+  }
   cerrarHojas();
 }
 
-// -------------------------- entrada / onboarding --------------------------
+// -------------------------- entrada --------------------------
 
 function mostrarEntrada() {
   document.getElementById('overlay-entrada').removeAttribute('hidden');
@@ -1112,8 +1391,7 @@ function pasoEntrada(paso) {
   document.getElementById('paso-' + paso).style.display = 'flex';
   if (paso === 'instalar') {
     document.getElementById('boton-instalar-real').innerHTML = deferredInstallPrompt
-      ? `<button class="boton" style="width:100%;background:var(--crema);color:var(--tinta-honda)" onclick="instalarAhora()">Instalar ahora</button>`
-      : '';
+      ? `<button class="boton" style="width:100%;background:var(--crema);color:var(--tinta-honda)" onclick="instalarAhora()">Instalar ahora</button>` : '';
   }
 }
 async function cerrarEntrada() {
@@ -1129,7 +1407,49 @@ async function instalarAhora() {
   }
   cerrarEntrada();
 }
-</script>
 
+// -------------------------- gestos --------------------------
+
+// Deslizar de lado en la pantalla de lectura = pasar de oración, como
+// pasar la hoja en el papel.
+function montarGestos() {
+  const zona = document.getElementById('p-leer');
+  let x0 = null, y0 = null;
+  zona.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) { x0 = null; return; }
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive: true });
+  zona.addEventListener('touchend', e => {
+    if (x0 == null || !e.changedTouches.length) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    // solo si es claramente horizontal, para no robarle el gesto al scroll
+    if (Math.abs(dx) > 70 && Math.abs(dy) < 45) irVecino(dx < 0 ? 1 : -1);
+    x0 = null;
+  }, { passive: true });
+}
+
+// -------------------------- inicio --------------------------
+
+function iniciar() {
+  registrarSW();
+  document.getElementById('campo-buscar').addEventListener('input', e => {
+    const q = e.target.value;
+    history.replaceState(null, '', location.pathname + '#/buscar' + (q ? ('?q=' + encodeURIComponent(q)) : ''));
+    renderizarBuscar(q);
+  });
+  document.getElementById('p-leer').addEventListener('scroll', actualizarProgreso);
+  montarGestos();
+  arrancar().catch(e => { console.error('arranque:', e); mostrarError(e); });
+}
+
+// Si el script se evalúa cuando el DOM ya está listo, el evento no volverá
+// a dispararse: hay que arrancar igualmente o la app se queda en blanco.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', iniciar);
+} else {
+  iniciar();
+}
+</script>
 </body>
 </html>

@@ -26,8 +26,21 @@ function cabecerasCORS(origen) {
   return {
     'Access-Control-Allow-Origin': permitido ? origen : 'null',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'If-None-Match',
     'Vary': 'Origin',
   };
+}
+
+// ETag a partir del contenido: si no ha cambiado, la app recibe un 304 y no
+// se descarga otra vez el JSON entero. El campo "version" de dentro del
+// propio JSON es lo que la app compara para decidir si reemplaza lo que
+// tiene en IndexedDB; el ETag solo ahorra datos.
+async function calcularETag(texto) {
+  const datos = new TextEncoder().encode(texto);
+  const hash = await crypto.subtle.digest('SHA-256', datos);
+  const hex = Array.from(new Uint8Array(hash).slice(0, 16))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  return `"${hex}"`;
 }
 
 export default {
@@ -52,11 +65,19 @@ export default {
       );
     }
 
+    const etag = await calcularETag(datos);
+    if (request.headers.get('If-None-Match') === etag) {
+      return new Response(null, { status: 304, headers: { ...cors, ETag: etag } });
+    }
+
     return new Response(datos, {
       headers: {
         ...cors,
         'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'public, max-age=300',
+        // corto: cuando se suban las 300 reales interesa que llegue pronto.
+        // El grueso del ahorro lo hace el ETag, no este max-age.
+        'Cache-Control': 'public, max-age=60',
+        'ETag': etag,
       },
     });
   },
