@@ -150,6 +150,32 @@ else {
   if (!ocultaAlFinal) fallos++;
 }
 
+// Saludo personalizado: sin nombre no debe verse ningún hueco raro, y con
+// nombre guardado tiene que aparecer al entrar a Buscar con el campo vacío.
+console.log('\n--- SALUDO EN BUSCAR ---');
+window.location.hash = '#/buscar';
+await esperar(120);
+const sinNombre = doc.getElementById('contenido-buscar').innerHTML;
+console.log('  sin nombre, sin saludo:', sinNombre.includes('class="marca"') ? 'FALLO: hay un hueco de saludo vacío' : 'OK');
+if (sinNombre.includes('class="marca"')) fallos++;
+
+// CONFIG es un "let" del script, no cuelga de window (a diferencia de las
+// funciones, que sí). Se pasa por la función pública de verdad, con
+// prompt() sustituido, en vez de intentar tocar el estado interno.
+window.prompt = () => 'Agustín';
+await window.cambiarNombre();
+// re-render directo: ya estábamos en #/buscar, así que reasignar el mismo
+// hash no dispara hashchange y no repintaría
+window.renderizarBuscar('');
+await esperar(80);
+const conNombre = doc.getElementById('contenido-buscar').textContent;
+const hora = new Date().getHours();
+const esperado = hora < 13 ? 'Buenos días' : hora < 20 ? 'Buenas tardes' : 'Buenas noches';
+console.log('  con nombre, saluda:', conNombre.includes('Agustín') ? 'OK ("' + conNombre.slice(0, 40).trim() + '...")' : 'FALLO: no aparece el nombre');
+if (!conNombre.includes('Agustín')) fallos++;
+console.log('  saludo acorde a la hora (' + esperado + '):', conNombre.includes(esperado) ? 'OK' : 'FALLO');
+if (!conNombre.includes(esperado)) fallos++;
+
 if (errores.length) { console.log('\nERRORES EN CONSOLA:'); errores.forEach(e => console.log('  ' + e)); }
 
 console.log('\n=== ' + (fallos ? fallos + ' FALLOS' : 'TODO OK') + ' ===');

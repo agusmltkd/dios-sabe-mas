@@ -237,6 +237,11 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   padding:calc(2.4em + env(safe-area-inset-top)) calc(1.6em + env(safe-area-inset-right)) calc(2.4em + env(safe-area-inset-bottom)) calc(1.6em + env(safe-area-inset-left))}
 .overlay-entrada[hidden]{display:none}
 .paso-entrada{display:flex;flex-direction:column;align-items:center;width:100%}
+.campo-entrada{width:100%;max-width:320px;min-height:44px;background:rgba(239,226,198,.12);
+  border:1px solid rgba(239,226,198,.4);border-radius:.7em;padding:.85em 1em;
+  color:var(--crema);font-family:'Jost',sans-serif;font-weight:300;font-size:1em;
+  text-align:center;margin-bottom:.9em}
+.campo-entrada::placeholder{color:rgba(239,226,198,.6)}
 
 /* ---------- avisos ---------- */
 /* Ojo con esconder esto solo con transform: translateY(150%) es 150% de SU
@@ -380,6 +385,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
     <button class="fila" style="width:100%" onclick="alternarWakeLock()"><div>Pantalla siempre encendida</div><div class="sw" id="switch-wakelock"></div></button>
 
     <div class="bloque-tit">Tus cosas</div>
+    <button class="fila" style="width:100%" onclick="cambiarNombre()"><div>Tu nombre</div><div class="v" id="valor-nombre">›</div></button>
     <button class="fila" style="width:100%" onclick="exportarGuardadas()"><div>Exportar guardadas</div><div class="v">›</div></button>
     <button class="fila" style="width:100%" onclick="pedirImportar()"><div>Importar guardadas</div><div class="v">›</div></button>
     <button class="fila" style="width:100%" onclick="borrarHistorial()"><div>Borrar historial de búsqueda</div><div class="v">›</div></button>
@@ -436,7 +442,16 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
     <div style="font-family:'Sacramento',cursive;font-size:1.8em;max-width:16ch;margin:0 auto .5em;line-height:1.2">Detrás de casi todo lo que vivimos hay una oración</div>
     <div style="font-size:.9em;opacity:.9;max-width:30ch;margin:0 auto 1.6em;line-height:1.6">Las 300 del libro, buscables por lo que te está pasando. Sin conexión y sin cuenta.</div>
     <div class="rail" style="height:2.4em;margin:0 auto 1.6em;background:var(--crema)"></div>
-    <button class="boton" style="width:100%;max-width:320px;background:var(--crema);color:var(--tinta-honda)" onclick="pasoEntrada('instalar')">Empezar</button>
+    <button class="boton" style="width:100%;max-width:320px;background:var(--crema);color:var(--tinta-honda)" onclick="pasoEntrada('nombre')">Empezar</button>
+  </div>
+  <div class="paso-entrada" id="paso-nombre" style="display:none">
+    <div style="font-family:'Sacramento',cursive;font-size:1.6em;margin-bottom:.6em">¿Cómo te llamas?</div>
+    <div style="font-size:.88em;opacity:.9;max-width:28ch;margin:0 auto 1.4em;line-height:1.6">Para saludarte cuando abras a buscar. No se guarda en ningún sitio fuera de tu móvil.</div>
+    <input id="campo-nombre" class="campo-entrada" type="text" placeholder="Tu nombre" autocomplete="given-name" enterkeyhint="done" onkeydown="if(event.key==='Enter')guardarNombreEntrada()">
+    <button class="boton" style="width:100%;max-width:320px;background:var(--crema);color:var(--tinta-honda);margin-top:.4em" onclick="guardarNombreEntrada()">Continuar</button>
+    <div style="margin-top:.8em;max-width:320px;margin-left:auto;margin-right:auto">
+      <button class="boton hueco" style="width:100%;border-color:rgba(239,226,198,.4);color:var(--crema)" onclick="pasoEntrada('instalar')">Ahora no</button>
+    </div>
   </div>
   <div class="paso-entrada" id="paso-instalar" style="display:none">
     <div style="font-size:1.1em;letter-spacing:.26em;text-transform:uppercase;opacity:.9;margin-bottom:1em">Tenerla a mano</div>
@@ -473,7 +488,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v10 · 23 ago 2026';
+const VERSION_APP = 'v11 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -505,6 +520,7 @@ let GUARDADAS = new Map();        // n -> fecha ISO de guardado
 let CONFIG = {
   tema: 'auto', tamano: 'mediano', wakeLock: false,
   onboardingVisto: false, ultimaLeida: null, historial: [], recientes: [],
+  nombre: null,
 };
 let ACTUAL_N = null;
 let wakeLockRef = null;
@@ -1059,6 +1075,13 @@ function irAlAzar() {
 
 let _historialTimer = null;
 
+function saludoPorHora() {
+  const h = new Date().getHours();
+  if (h >= 6 && h < 13) return 'Buenos días';
+  if (h >= 13 && h < 20) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
 function pantallaBuscar(q) {
   mostrarPantalla('p-buscar', null);
   const campo = document.getElementById('campo-buscar');
@@ -1094,7 +1117,10 @@ function renderizarBuscar(q) {
   const texto = (q || '').trim();
 
   if (!normalizarJS(texto)) {
-    cont.innerHTML = `
+    const saludo = CONFIG.nombre
+      ? `<div class="marca" style="padding:.2em 0 1.1em"><div class="m1">${esc(saludoPorHora())}, ${esc(CONFIG.nombre)}</div></div>`
+      : '';
+    cont.innerHTML = saludo + `
       <div class="bloque-tit">Lo que más se busca</div>
       ${SUGERENCIAS_BUSQUEDA.map(s => `<button class="fila" style="width:100%" onclick="buscarTexto('${escAttr(s)}')"><div class="barrita"></div><div>${esc(s)}</div></button>`).join('')}
       <div class="bloque-tit">Por número</div>
@@ -1299,6 +1325,7 @@ function pantallaAjustes() {
   document.getElementById('valor-tema').textContent =
     ({ auto: 'Automático', dia: 'Día', noche: 'Noche' })[CONFIG.tema];
   document.getElementById('switch-wakelock').classList.toggle('off', !CONFIG.wakeLock);
+  document.getElementById('valor-nombre').textContent = CONFIG.nombre || 'Añadir';
   document.getElementById('version-app').textContent = diagnostico();
   document.getElementById('valor-version-datos').textContent =
     META.version ? META.version + (META.fecha ? ' · ' + META.fecha : '') : `${ORACIONES.length} oraciones`;
@@ -1349,6 +1376,18 @@ async function borrarHistorial() {
   CONFIG.historial = [];
   await guardarConfig();
   mostrarAviso('Historial borrado');
+}
+
+// Para quien lo saltó en la entrada, o quiere cambiarlo. prompt() nativo,
+// igual que confirm() arriba: no hace falta una hoja propia para un solo
+// campo de texto ocasional.
+async function cambiarNombre() {
+  const nuevo = prompt('¿Cómo te llamas?', CONFIG.nombre || '');
+  if (nuevo === null) return;
+  CONFIG.nombre = nuevo.trim() || null;
+  await guardarConfig();
+  pantallaAjustes();
+  mostrarAviso(CONFIG.nombre ? 'Guardado' : 'Nombre borrado');
 }
 
 async function reimportarContenido() {
@@ -1475,6 +1514,14 @@ function pasoEntrada(paso) {
     document.getElementById('boton-instalar-real').innerHTML = deferredInstallPrompt
       ? `<button class="boton" style="width:100%;background:var(--crema);color:var(--tinta-honda)" onclick="instalarAhora()">Instalar ahora</button>` : '';
   }
+  if (paso === 'nombre') {
+    setTimeout(() => document.getElementById('campo-nombre').focus(), 30);
+  }
+}
+async function guardarNombreEntrada() {
+  const nombre = document.getElementById('campo-nombre').value.trim();
+  if (nombre) { CONFIG.nombre = nombre; await guardarConfig(); }
+  pasoEntrada('instalar');
 }
 async function cerrarEntrada() {
   CONFIG.onboardingVisto = true;

@@ -28,7 +28,7 @@
  * Al cambiar index.html, sube CACHE_VERSION: tira las cachés viejas.
  */
 
-const CACHE_VERSION = "v8";
+const CACHE_VERSION = "v9";
 const CACHE_SHELL = `dios-sabe-mas-shell-${CACHE_VERSION}`;
 const CACHE_DATOS = `dios-sabe-mas-datos-${CACHE_VERSION}`;
 
