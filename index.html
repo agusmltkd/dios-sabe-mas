@@ -129,6 +129,7 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 #campo-buscar{flex:1;background:none;border:none;outline:none;font-family:'Jost',sans-serif;font-weight:300;font-size:1em;color:var(--tinta);min-width:0}
 #campo-buscar::placeholder{color:var(--tinta-secundaria)}
 .ico-buscar{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.ico-compartir{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.05em}
 .chips{display:flex;flex-wrap:wrap;gap:.45em;margin-top:1em}
 .chip{border:1px solid var(--linea);border-radius:2em;padding:.55em .95em;font-size:.85em;background:var(--papel-hueso);min-height:36px;display:inline-flex;align-items:center}
 .boton{display:flex;align-items:center;justify-content:center;gap:.6em;background:var(--tinta);color:var(--papel);border-radius:.7em;padding:.95em;font-size:.86em;letter-spacing:.14em;text-transform:uppercase;min-height:44px}
@@ -335,10 +336,10 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
       </div>
     </div>
     <div class="acciones">
-      <button class="icono-plano" id="accion-favorito" onclick="alternarFavoritoActual()" aria-label="Guardar">♡</button>
-      <button class="icono-plano" onclick="compartir()" aria-label="Compartir">⤴</button>
-      <button class="icono-plano" id="accion-pantalla" onclick="alternarWakeLock()" aria-label="Pantalla siempre encendida">◔</button>
       <button class="icono-plano" onclick="location.hash='#/hoy'" aria-label="Inicio">⌂</button>
+      <button class="icono-plano" id="accion-favorito" onclick="alternarFavoritoActual()" aria-label="Guardar">♡</button>
+      <button class="icono-plano" onclick="compartir()" aria-label="Compartir"><svg class="ico-compartir" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+      <button class="icono-plano" id="accion-pantalla" onclick="alternarWakeLock()" aria-label="Pantalla siempre encendida">◔</button>
       <span class="par-nav">
         <button class="icono-plano" onclick="irVecino(-1)" aria-label="Anterior">‹</button>
         <button class="icono-plano" onclick="irVecino(1)" aria-label="Siguiente">›</button>
@@ -472,7 +473,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v9 · 23 ago 2026';
+const VERSION_APP = 'v10 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';

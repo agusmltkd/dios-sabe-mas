@@ -123,6 +123,12 @@ if (btnInicio) {
   if (!ok) fallos++;
 }
 
+// Pedido explícitamente: el primero de todos, a la izquierda del resto.
+const primerBoton = doc.querySelector('#p-leer .acciones button');
+const esPrimero = primerBoton === btnInicio;
+console.log('  es el primero (más a la izquierda):', esPrimero ? 'OK' : 'FALLO: hay otro botón antes');
+if (!esPrimero) fallos++;
+
 // La barra de acciones queda anclada al fondo de #p-leer (position:absolute
 // sobre .lect-scroll), no como sticky dentro del propio scroll: así no se
 // ve la siguiente oración asomando por debajo al hacer scroll.
