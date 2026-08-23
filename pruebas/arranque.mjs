@@ -108,6 +108,42 @@ await esperar(400);
 console.log('  texto tras ocultarse:', aviso.textContent === '' ? 'vacio OK' : `FALLO: "${aviso.textContent}"`);
 if (aviso.textContent !== '') fallos++;
 
+// Botón de inicio dentro de la lectura (pedido explícitamente: una
+// "casita" junto a guardar/compartir/pantalla que lleve a Hoy).
+console.log('\n--- BOTON DE INICIO EN LECTURA ---');
+window.location.hash = '#/o/59';
+await esperar(150);
+const btnInicio = doc.querySelector('#p-leer .acciones [aria-label="Inicio"]');
+console.log('  presente:', btnInicio ? 'OK' : 'FALLO: no esta');
+if (!btnInicio) fallos++;
+if (btnInicio) {
+  const va = btnInicio.getAttribute('onclick') || '';
+  const ok = va.includes("'#/hoy'");
+  console.log('  lleva a #/hoy:', ok ? 'OK' : 'FALLO: onclick="' + va + '"');
+  if (!ok) fallos++;
+}
+
+// La barra de acciones queda anclada al fondo de #p-leer (position:absolute
+// sobre .lect-scroll), no como sticky dentro del propio scroll: así no se
+// ve la siguiente oración asomando por debajo al hacer scroll.
+const scrollExiste = !!doc.getElementById('lect-scroll');
+const accionesFuera = doc.querySelector('#p-leer > .acciones') !== null;
+console.log('  #lect-scroll existe:', scrollExiste ? 'OK' : 'FALLO');
+console.log('  .acciones es hermana de .lect-scroll (no está dentro):', accionesFuera ? 'OK' : 'FALLO');
+if (!scrollExiste) fallos++;
+if (!accionesFuera) fallos++;
+
+// Pantalla de apertura: visible al arrancar, se retira sola.
+console.log('\n--- PANTALLA DE APERTURA ---');
+const splash = doc.getElementById('splash');
+console.log('  presente en el HTML:', splash ? 'OK' : 'FALLO');
+if (!splash) fallos++;
+else {
+  const ocultaAlFinal = splash.classList.contains('oculto');
+  console.log('  se retira sola (tras el arranque + margen):', ocultaAlFinal ? 'OK' : 'FALLO: sigue visible');
+  if (!ocultaAlFinal) fallos++;
+}
+
 if (errores.length) { console.log('\nERRORES EN CONSOLA:'); errores.forEach(e => console.log('  ' + e)); }
 
 console.log('\n=== ' + (fallos ? fallos + ' FALLOS' : 'TODO OK') + ' ===');

@@ -170,11 +170,19 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .oracion .num{font-family:'Sacramento',cursive;font-size:3em;line-height:.85;color:var(--tinta-suave)}
 .oracion h2{font-family:'Sacramento',cursive;font-weight:400;font-size:1.8em;line-height:1.08;margin:.12em 0 .85em}
 .oracion p{font-size:calc(.93em * var(--tam));line-height:1.85;margin-bottom:.8em}
-/* Fijo abajo mientras se lee. Con la letra en "enorme" el texto es tan
-   largo que la barra se iba al final del scroll y había que bajar hasta
-   abajo del todo para guardar o compartir. */
-.acciones{display:flex;justify-content:space-between;align-items:center;padding:.4em 0 .2em;border-top:1px solid var(--linea);margin-top:.35em;
-  position:sticky;bottom:0;background:var(--papel);z-index:3}
+/* Pantalla de lectura: lo que se desplaza va en .lect-scroll; la barra de
+   acciones queda FUERA de ese scroll, anclada con position:absolute al
+   fondo real de #p-leer (no sticky: dentro de un contenedor flex con
+   scroll, sticky+bottom es poco fiable en iOS y dejaba ver la siguiente
+   oración asomando por debajo de la barra). .lect-scroll reserva abajo la
+   altura de la barra para que el texto nunca quede oculto tras ella. */
+.pantalla-leer{padding:0;position:relative}
+.lect-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:1.5em 1.4em calc(4.6em + env(safe-area-inset-bottom))}
+.acciones{display:flex;justify-content:space-between;align-items:center;
+  padding:.6em 1.4em calc(.5em + env(safe-area-inset-bottom));
+  border-top:1px solid var(--linea);
+  position:absolute;left:0;right:0;bottom:0;background:var(--papel);z-index:3}
 .par-nav{display:inline-flex;gap:.2em}
 
 /* ---------- hoja inferior ---------- */
@@ -208,6 +216,19 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .prosa{font-size:.88em;line-height:1.8}
 .prosa p{margin-bottom:.7em}
 .pie{font-size:.72em;color:var(--tinta-secundaria);text-align:center;padding:1em 0 1.4em;line-height:1.6;letter-spacing:.04em}
+
+/* ---------- apertura ---------- */
+/* z-index por encima del onboarding: si es la primera vez, la apertura
+   tapa el overlay de entrada mientras dura y al retirarse deja verlo. */
+.splash{position:fixed;inset:0;z-index:80;background:var(--tinta-honda);color:var(--crema);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:calc(2em + env(safe-area-inset-top)) 1.6em calc(2em + env(safe-area-inset-bottom));
+  transition:opacity .4s ease,visibility .4s}
+.splash.oculto{opacity:0;visibility:hidden;pointer-events:none}
+.splash-logo{width:104px;height:104px;border-radius:24px;margin-bottom:1.5em;
+  box-shadow:0 22px 50px -18px rgba(0,0,0,.6)}
+.splash-sub{font-family:'Sacramento',cursive;font-size:1.35em;opacity:.85;margin-bottom:.35em}
+.splash-marca{font-size:1.15em;letter-spacing:.32em;font-weight:200}
 
 /* ---------- entrada / onboarding ---------- */
 .overlay-entrada{position:fixed;inset:0;background:var(--tinta-honda);color:var(--crema);z-index:60;
@@ -247,6 +268,16 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 </head>
 <body>
 <noscript><div style="padding:2em;text-align:center">Esta app necesita JavaScript.</div></noscript>
+
+<!-- Pantalla de apertura: se ve SIEMPRE al abrir la app, no solo la
+     primera vez (eso es .overlay-entrada, aparte, más abajo). Visible por
+     defecto en el HTML para que sea lo primero que se pinta, antes incluso
+     de que el script termine de cargar los datos. -->
+<div class="splash" id="splash" onclick="ocultarSplash()">
+  <img src="iconos/icon-192.png" alt="" class="splash-logo">
+  <div class="splash-sub">300 oraciones para rezar con la vida</div>
+  <div class="splash-marca">DIOS SABE MÁS</div>
+</div>
 
 <div class="app" id="app">
 
@@ -292,19 +323,22 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   </section>
 
   <!-- LEER -->
-  <section class="pantalla" id="p-leer">
-    <div class="lect-top">
-      <button class="icono-plano" onclick="volver()" aria-label="Atrás">‹</button>
-      <button class="icono-plano" onclick="abrirHojaLectura()" aria-label="Ajustes de lectura">Aa</button>
-    </div>
-    <div class="oracion">
-      <div class="rail lectura" id="rail-lectura"></div>
-      <div class="cuerpo seleccionable" id="cuerpo-lectura"></div>
+  <section class="pantalla pantalla-leer" id="p-leer">
+    <div class="lect-scroll" id="lect-scroll">
+      <div class="lect-top">
+        <button class="icono-plano" onclick="volver()" aria-label="Atrás">‹</button>
+        <button class="icono-plano" onclick="abrirHojaLectura()" aria-label="Ajustes de lectura">Aa</button>
+      </div>
+      <div class="oracion">
+        <div class="rail lectura" id="rail-lectura"></div>
+        <div class="cuerpo seleccionable" id="cuerpo-lectura"></div>
+      </div>
     </div>
     <div class="acciones">
       <button class="icono-plano" id="accion-favorito" onclick="alternarFavoritoActual()" aria-label="Guardar">♡</button>
-      <button class="icono-plano" onclick="abrirHojaCompartir()" aria-label="Compartir">⤴</button>
+      <button class="icono-plano" onclick="compartir()" aria-label="Compartir">⤴</button>
       <button class="icono-plano" id="accion-pantalla" onclick="alternarWakeLock()" aria-label="Pantalla siempre encendida">◔</button>
+      <button class="icono-plano" onclick="location.hash='#/hoy'" aria-label="Inicio">⌂</button>
       <span class="par-nav">
         <button class="icono-plano" onclick="irVecino(-1)" aria-label="Anterior">‹</button>
         <button class="icono-plano" onclick="irVecino(1)" aria-label="Siguiente">›</button>
@@ -438,7 +472,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v8 · 23 ago 2026';
+const VERSION_APP = 'v9 · 23 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -1199,7 +1233,7 @@ function pantallaLeer(n) {
   favBtn.classList.toggle('on', activo);
   favBtn.textContent = activo ? '♥' : '♡';
   document.getElementById('accion-pantalla').classList.toggle('on', !!CONFIG.wakeLock);
-  document.getElementById('p-leer').scrollTop = 0;
+  document.getElementById('lect-scroll').scrollTop = 0;
   document.getElementById('rail-lectura').style.setProperty('--progreso', '0%');
 
   CONFIG.ultimaLeida = n;
@@ -1372,6 +1406,21 @@ function textoParaCompartir(o) {
 function enlaceDe(n) {
   return location.origin + location.pathname + '#/o/' + n;
 }
+// Botón principal ⤴: directo a la hoja nativa de compartir de iOS/Android,
+// con el enlace a la oración incluido. Si el navegador no tiene esa API
+// (algunos de escritorio), se cae a la hoja propia de siempre.
+async function compartir() {
+  const o = ORACIONES.find(x => x.n === ACTUAL_N);
+  if (!o) return;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: o.titulo, text: textoParaCompartir(o), url: enlaceDe(o.n) });
+    } catch (e) { /* cancelado por la persona, o sin permiso: sin ruido */ }
+  } else {
+    abrirHojaCompartir();
+  }
+}
+
 function abrirHojaCompartir() {
   const o = ORACIONES.find(x => x.n === ACTUAL_N);
   if (!o) return;
@@ -1488,6 +1537,25 @@ function mostrarFalloArranque(motivo) {
 window.addEventListener('error', e => mostrarFalloArranque(e.error || e.message));
 window.addEventListener('unhandledrejection', e => mostrarFalloArranque(e.reason));
 
+// -------------------------- pantalla de apertura --------------------------
+
+// Se ve SIEMPRE al abrir la app (a diferencia de .overlay-entrada, que es
+// solo la primera vez). Dura un mínimo perceptible aunque la carga sea
+// instantánea, y nunca más de SPLASH_MAXIMO por si algo se cuelga: mejor
+// pasar a la app con datos a medio cargar que dejar a alguien mirando el
+// logo para siempre.
+const SPLASH_MINIMO = 900;
+const SPLASH_MAXIMO = 3500;
+const _inicioSplash = Date.now();
+let _splashOculto = false;
+function ocultarSplash() {
+  if (_splashOculto) return;
+  _splashOculto = true;
+  const el = document.getElementById('splash');
+  if (el) el.classList.add('oculto');
+}
+setTimeout(ocultarSplash, SPLASH_MAXIMO);
+
 function iniciar() {
   // 1. Pintar el armazón YA, antes de tocar nada que pueda fallar. Si algo
   //    revienta después, al menos se ve la app y no un hueco en blanco.
@@ -1500,13 +1568,18 @@ function iniciar() {
       history.replaceState(null, '', location.pathname + '#/buscar' + (q ? ('?q=' + encodeURIComponent(q)) : ''));
       renderizarBuscar(q);
     });
-    document.getElementById('p-leer').addEventListener('scroll', actualizarProgreso);
+    document.getElementById('lect-scroll').addEventListener('scroll', actualizarProgreso);
     montarGestos();
   } catch (e) { console.error('interfaz:', e); }
 
   // 3. Service worker y datos, cada uno por su cuenta.
   try { registrarSW(); } catch (e) { console.error('sw:', e); }
-  arrancar().catch(e => { console.error('arranque:', e); mostrarError(e); });
+  arrancar()
+    .catch(e => { console.error('arranque:', e); mostrarError(e); })
+    .finally(() => {
+      const falta = SPLASH_MINIMO - (Date.now() - _inicioSplash);
+      setTimeout(ocultarSplash, Math.max(0, falta));
+    });
 }
 
 // Si el script se evalúa cuando el DOM ya está listo, el evento no volverá
