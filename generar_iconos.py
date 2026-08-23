@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-generar_iconos.py — Icono provisional de la PWA.
+generar_iconos.py — Icono de la PWA.
 
-No hay todavía un logo diseñado para la app, así que este script dibuja un
-icono mínimo con el único elemento de marca que el proyecto ya tiene
-decidido: la barra vertical del libro (ver CLAUDE.md, "Elemento firma"),
-en tinta sobre crema. Es un marcador de posición fácil de tirar el día que
-haya un icono de verdad — basta con sustituir los PNG en iconos/.
+Intento de recrear a mano (sin el fichero original) el logo que se decidió
+para la app: el trazo "↑ = +" en blanco sobre el azul del proyecto. Al no
+tener el fichero real, esto es una versión limpia con líneas gruesas de
+cabo redondeado — no lleva la textura de pincel del original. Si el
+fichero real llega en algún momento, este script se sustituye por uno que
+simplemente reescale ese PNG/SVG a los tamaños de abajo.
 
 Genera:
     iconos/icon-192.png            (cualquier uso)
@@ -22,51 +23,87 @@ Uso:
 from pathlib import Path
 from PIL import Image, ImageDraw
 
-TINTA = (62, 90, 103, 255)        # --tinta
-CREMA = (239, 226, 198, 255)      # --crema
+TINTA = (62, 90, 103, 255)        # --tinta, el azul del proyecto
+BLANCO = (255, 255, 255, 255)
 DEST = Path("iconos")
 DEST.mkdir(exist_ok=True)
 
 
-def barra(tamano: int, radio_esquina: float, alto_barra: float, ancho_barra: float) -> Image.Image:
-    """Cuadrado redondeado en tinta con la barra vertical en crema, centrada."""
+def trazo(draw: ImageDraw.ImageDraw, p1, p2, ancho: float, color):
+    """Línea gruesa con los dos cabos redondeados, para que parezca un
+    trazo de pincel y no un segmento con las puntas cuadradas."""
+    draw.line([p1, p2], fill=color, width=round(ancho))
+    r = ancho / 2
+    for (x, y) in (p1, p2):
+        draw.ellipse([x - r, y - r, x + r, y + r], fill=color)
+
+
+def marca(tamano: int, escala: float = 0.62) -> Image.Image:
+    """↑ = + centrados, en blanco, sobre un cuadrado redondeado en tinta.
+    `escala` es cuánto del ANCHO del lienzo ocupa la fila entera de los 3
+    símbolos (más pequeño para la variante maskable, que Android recorta
+    en círculo)."""
     img = Image.new("RGBA", (tamano, tamano), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     d.rounded_rectangle([0, 0, tamano - 1, tamano - 1],
-                         radius=tamano * radio_esquina, fill=TINTA)
-    bw = tamano * ancho_barra
-    bh = tamano * alto_barra
-    x0 = (tamano - bw) / 2
-    y0 = (tamano - bh) / 2
-    d.rounded_rectangle([x0, y0, x0 + bw, y0 + bh], radius=bw / 2, fill=CREMA)
+                         radius=tamano * 0.18, fill=TINTA)
+
+    cy = tamano / 2
+    ancho_fila = tamano * escala     # ancho total de los 3 glifos + huecos
+    gw = ancho_fila / 4              # ancho de cada glifo (3 glifos + 2 huecos de gw/2)
+    hueco = gw / 2
+    paso = gw + hueco                # distancia centro a centro
+
+    alto = tamano * 0.36             # alto de cada glifo (independiente del ancho)
+    medio = alto / 2
+    ancho_trazo = gw * 0.26
+
+    cx0 = tamano / 2 - paso          # centro del primer glifo (↑)
+    cx1 = tamano / 2                 # centro del segundo (=)
+    cx2 = tamano / 2 + paso          # centro del tercero (+)
+
+    # ↑ — tallo más punta en V
+    x = cx0
+    trazo(d, (x, cy + medio), (x, cy - medio * 0.25), ancho_trazo, BLANCO)
+    trazo(d, (x, cy - medio), (x - gw * 0.5, cy - medio * 0.15), ancho_trazo, BLANCO)
+    trazo(d, (x, cy - medio), (x + gw * 0.5, cy - medio * 0.15), ancho_trazo, BLANCO)
+
+    # = — dos líneas horizontales
+    x = cx1
+    y1 = cy - medio * 0.42
+    y2 = cy + medio * 0.42
+    trazo(d, (x - gw / 2, y1), (x + gw / 2, y1), ancho_trazo, BLANCO)
+    trazo(d, (x - gw / 2, y2), (x + gw / 2, y2), ancho_trazo, BLANCO)
+
+    # + — cruz
+    x = cx2
+    trazo(d, (x, cy - medio), (x, cy + medio), ancho_trazo, BLANCO)
+    trazo(d, (x - gw / 2, cy), (x + gw / 2, cy), ancho_trazo, BLANCO)
+
     return img
 
 
-def opaco(tamano: int, alto_barra: float, ancho_barra: float) -> Image.Image:
-    """Igual, pero sin esquinas redondeadas ni transparencia (apple-touch-icon:
-    iOS le pone su propio marco y no quiere alfa)."""
-    img = Image.new("RGB", (tamano, tamano), TINTA[:3])
-    d = ImageDraw.Draw(img)
-    bw = tamano * ancho_barra
-    bh = tamano * alto_barra
-    x0 = (tamano - bw) / 2
-    y0 = (tamano - bh) / 2
-    d.rounded_rectangle([x0, y0, x0 + bw, y0 + bh], radius=bw / 2, fill=CREMA)
-    return img
+def opaco(tamano: int, escala: float = 0.62) -> Image.Image:
+    """Igual, pero sin esquinas redondeadas ni transparencia (apple-touch-
+    icon: iOS le pone su propio marco y no quiere alfa)."""
+    con_alfa = marca(tamano, escala)
+    fondo = Image.new("RGB", (tamano, tamano), TINTA[:3])
+    fondo.paste(con_alfa, (0, 0), con_alfa)
+    return fondo
 
 
-# iconos normales: esquina suave, barra ocupa buena parte del alto
-barra(192, radio_esquina=0.18, alto_barra=0.56, ancho_barra=0.16).save(DEST / "icon-192.png")
-barra(512, radio_esquina=0.18, alto_barra=0.56, ancho_barra=0.16).save(DEST / "icon-512.png")
+# iconos normales
+marca(192, escala=0.60).save(DEST / "icon-192.png")
+marca(512, escala=0.60).save(DEST / "icon-512.png")
 
-# maskable: Android recorta hasta un círculo inscrito, así que el contenido
-# tiene que caber en la zona segura central (~80% del lienzo)
-barra(512, radio_esquina=0, alto_barra=0.42, ancho_barra=0.12).save(DEST / "icon-maskable-512.png")
+# maskable: Android recorta hasta un círculo inscrito, así que la fila de
+# símbolos tiene que caber en la zona segura central (~80% del lienzo)
+marca(512, escala=0.42).save(DEST / "icon-maskable-512.png")
 
 # apple-touch-icon: opaco, iOS redondea el propio
-opaco(180, alto_barra=0.5, ancho_barra=0.15).save(DEST / "apple-touch-icon.png")
+opaco(180, escala=0.60).save(DEST / "apple-touch-icon.png")
 
-# favicon pequeño: barra un poco más gruesa para que no desaparezca a 16-32px
-barra(48, radio_esquina=0.22, alto_barra=0.6, ancho_barra=0.22).save(DEST / "favicon.png")
+# favicon pequeño: trazo relativamente más grueso para que no desaparezca
+marca(48, escala=0.66).save(DEST / "favicon.png")
 
 print(f"5 iconos -> {DEST}/")
