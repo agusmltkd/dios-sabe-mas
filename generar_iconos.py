@@ -1,109 +1,68 @@
 #!/usr/bin/env python3
 """
-generar_iconos.py — Icono de la PWA.
+generar_iconos.py — Recorta y reescala el logo real a los tamaños de la PWA.
 
-Intento de recrear a mano (sin el fichero original) el logo que se decidió
-para la app: el trazo "↑ = +" en blanco sobre el azul del proyecto. Al no
-tener el fichero real, esto es una versión limpia con líneas gruesas de
-cabo redondeado — no lleva la textura de pincel del original. Si el
-fichero real llega en algún momento, este script se sustituye por uno que
-simplemente reescale ese PNG/SVG a los tamaños de abajo.
+Parte de iconos/logo.png (el trazo "↑ = +" de pincel, cuadrado, fondo
+azul a sangre). Ese fichero es la fuente; este script no dibuja nada, solo
+lo reescala y le añade el margen que necesita cada uso:
+
+- Iconos normales: poco margen, el trazo se ve grande y seguro.
+- Maskable (Android): el logo original tiene solo ~3.5% de margen
+  horizontal, y Android recorta en círculo — con eso se comería la punta
+  de la flecha y el brazo derecho del "+". Se encoge más para dejar sitio.
+- apple-touch-icon: igual que el normal, pero forzado a RGB opaco (iOS no
+  quiere canal alfa).
 
 Genera:
-    iconos/icon-192.png            (cualquier uso)
-    iconos/icon-512.png            (cualquier uso)
-    iconos/icon-maskable-512.png   (con margen de seguridad para Android)
-    iconos/apple-touch-icon.png    (180x180, fondo opaco, sin transparencia)
-    iconos/favicon.png             (48x48, para la pestaña del navegador)
+    iconos/icon-192.png
+    iconos/icon-512.png
+    iconos/icon-maskable-512.png
+    iconos/apple-touch-icon.png
+    iconos/favicon.png
 
 Uso:
     python generar_iconos.py
 """
 
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image
 
-TINTA = (62, 90, 103, 255)        # --tinta, el azul del proyecto
-BLANCO = (255, 255, 255, 255)
+FUENTE = Path("iconos/logo.png")
 DEST = Path("iconos")
+
+
+def procesar(tamano: int, escala: float) -> Image.Image:
+    """Reescala el logo entero (con su propio fondo) a `tamano * escala` y
+    lo centra sobre un lienzo `tamano`x`tamano` del mismo azul de fondo —
+    así el encogimiento añade margen sin que se note la costura."""
+    origen = Image.open(FUENTE).convert("RGB")
+    fondo = origen.getpixel((2, 2))  # color de fondo, de una esquina
+
+    lienzo = Image.new("RGB", (tamano, tamano), fondo)
+    lado = round(tamano * escala)
+    logo = origen.resize((lado, lado), Image.LANCZOS)
+    offset = (tamano - lado) // 2
+    lienzo.paste(logo, (offset, offset))
+    return lienzo
+
+
+if not FUENTE.exists():
+    raise SystemExit(f"Falta {FUENTE} — pon ahí el logo cuadrado antes de ejecutar esto.")
+
 DEST.mkdir(exist_ok=True)
 
+# iconos normales: margen modesto, el trazo se ve grande
+procesar(192, escala=0.90).save(DEST / "icon-192.png")
+procesar(512, escala=0.90).save(DEST / "icon-512.png")
 
-def trazo(draw: ImageDraw.ImageDraw, p1, p2, ancho: float, color):
-    """Línea gruesa con los dos cabos redondeados, para que parezca un
-    trazo de pincel y no un segmento con las puntas cuadradas."""
-    draw.line([p1, p2], fill=color, width=round(ancho))
-    r = ancho / 2
-    for (x, y) in (p1, p2):
-        draw.ellipse([x - r, y - r, x + r, y + r], fill=color)
+# maskable: mucho más margen, para que el círculo de recorte de Android
+# no se coma la punta de la flecha ni el brazo del "+"
+procesar(512, escala=0.75).save(DEST / "icon-maskable-512.png")
 
+# apple-touch-icon: mismo tratamiento que el normal, ya sale en RGB opaco
+procesar(180, escala=0.90).save(DEST / "apple-touch-icon.png")
 
-def marca(tamano: int, escala: float = 0.62) -> Image.Image:
-    """↑ = + centrados, en blanco, sobre un cuadrado redondeado en tinta.
-    `escala` es cuánto del ANCHO del lienzo ocupa la fila entera de los 3
-    símbolos (más pequeño para la variante maskable, que Android recorta
-    en círculo)."""
-    img = Image.new("RGBA", (tamano, tamano), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.rounded_rectangle([0, 0, tamano - 1, tamano - 1],
-                         radius=tamano * 0.18, fill=TINTA)
+# favicon: algo menos de margen, para que el trazo no se pierda a 48px
+procesar(48, escala=0.94).save(DEST / "favicon.png")
 
-    cy = tamano / 2
-    ancho_fila = tamano * escala     # ancho total de los 3 glifos + huecos
-    gw = ancho_fila / 4              # ancho de cada glifo (3 glifos + 2 huecos de gw/2)
-    hueco = gw / 2
-    paso = gw + hueco                # distancia centro a centro
-
-    alto = tamano * 0.36             # alto de cada glifo (independiente del ancho)
-    medio = alto / 2
-    ancho_trazo = gw * 0.26
-
-    cx0 = tamano / 2 - paso          # centro del primer glifo (↑)
-    cx1 = tamano / 2                 # centro del segundo (=)
-    cx2 = tamano / 2 + paso          # centro del tercero (+)
-
-    # ↑ — tallo más punta en V
-    x = cx0
-    trazo(d, (x, cy + medio), (x, cy - medio * 0.25), ancho_trazo, BLANCO)
-    trazo(d, (x, cy - medio), (x - gw * 0.5, cy - medio * 0.15), ancho_trazo, BLANCO)
-    trazo(d, (x, cy - medio), (x + gw * 0.5, cy - medio * 0.15), ancho_trazo, BLANCO)
-
-    # = — dos líneas horizontales
-    x = cx1
-    y1 = cy - medio * 0.42
-    y2 = cy + medio * 0.42
-    trazo(d, (x - gw / 2, y1), (x + gw / 2, y1), ancho_trazo, BLANCO)
-    trazo(d, (x - gw / 2, y2), (x + gw / 2, y2), ancho_trazo, BLANCO)
-
-    # + — cruz
-    x = cx2
-    trazo(d, (x, cy - medio), (x, cy + medio), ancho_trazo, BLANCO)
-    trazo(d, (x - gw / 2, cy), (x + gw / 2, cy), ancho_trazo, BLANCO)
-
-    return img
-
-
-def opaco(tamano: int, escala: float = 0.62) -> Image.Image:
-    """Igual, pero sin esquinas redondeadas ni transparencia (apple-touch-
-    icon: iOS le pone su propio marco y no quiere alfa)."""
-    con_alfa = marca(tamano, escala)
-    fondo = Image.new("RGB", (tamano, tamano), TINTA[:3])
-    fondo.paste(con_alfa, (0, 0), con_alfa)
-    return fondo
-
-
-# iconos normales
-marca(192, escala=0.60).save(DEST / "icon-192.png")
-marca(512, escala=0.60).save(DEST / "icon-512.png")
-
-# maskable: Android recorta hasta un círculo inscrito, así que la fila de
-# símbolos tiene que caber en la zona segura central (~80% del lienzo)
-marca(512, escala=0.42).save(DEST / "icon-maskable-512.png")
-
-# apple-touch-icon: opaco, iOS redondea el propio
-opaco(180, escala=0.60).save(DEST / "apple-touch-icon.png")
-
-# favicon pequeño: trazo relativamente más grueso para que no desaparezca
-marca(48, escala=0.66).save(DEST / "favicon.png")
-
-print(f"5 iconos -> {DEST}/")
+print(f"5 iconos -> {DEST}/ (fuente: {FUENTE})")
