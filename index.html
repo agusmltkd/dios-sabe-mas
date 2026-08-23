@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#3E5A67">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Las 300 oraciones de Dios sabe más, de Ignacio del Rey, a mano en el móvil. Sin conexión, sin cuenta.">
@@ -52,7 +52,7 @@
   --linea:rgba(239,226,198,.18);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none}
 html{-webkit-text-size-adjust:100%}
 button{all:unset;cursor:pointer;box-sizing:border-box;font:inherit;color:inherit}
 button:focus-visible,input:focus-visible{outline:2px solid var(--tinta-suave);outline-offset:2px}
@@ -61,12 +61,29 @@ body{
   font-family:'Jost',-apple-system,'Segoe UI',sans-serif;font-weight:300;
   line-height:1.6;
 }
+/* que no se sienta como una página web: sin zoom, sin seleccionar texto,
+   sin el menú de "mantener pulsado", sin el flash gris al tocar, sin el
+   rebote de scroll que asoma el fondo del sistema por los bordes. */
+html,body{touch-action:manipulation}
+body{
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.pantalla,.hoja{overscroll-behavior-y:contain}
 
 /* ---------- carcasa de la app ---------- */
 .app{
   position:relative;max-width:560px;margin:0 auto;background:var(--papel);color:var(--tinta);
   min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden;
   container-type:inline-size;font-size:clamp(14px,3.3cqw,16.5px);
+  /* deja sitio al notch/Dynamic Island y a la barra de gestos de abajo
+     cuando la app corre instalada a pantalla completa (viewport-fit=cover) */
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
 }
 @media (min-width:640px){
   body{padding:32px 16px}
@@ -109,6 +126,7 @@ body{
 .contador{font-size:.76em;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-suave);margin:1em 0 .2em}
 .lect-top{display:flex;justify-content:space-between;align-items:center;padding:.5em 0 1.1em;font-size:1.1em}
 .icono-plano{font-size:1.05em;opacity:.75;padding:.35em .45em;line-height:1}
+.ico-buscar{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;vertical-align:-.125em}
 .icono-plano.on{opacity:1}
 .icono-plano:hover{opacity:1}
 
@@ -149,7 +167,8 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 .velo{position:fixed;inset:0;background:rgba(41,67,81,.4);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s ease}
 .velo.mostrar{opacity:1;pointer-events:auto}
 .hoja{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:100%;max-width:560px;
-  background:var(--papel-hueso);color:var(--tinta);border-radius:1.3em 1.3em 0 0;padding:1.1em 1.5em 1.6em;
+  background:var(--papel-hueso);color:var(--tinta);border-radius:1.3em 1.3em 0 0;
+  padding:1.1em 1.5em calc(1.6em + env(safe-area-inset-bottom));
   box-shadow:0 -14px 30px -14px rgba(41,67,81,.5);z-index:41;transition:transform .25s ease;max-height:80vh;overflow-y:auto}
 .hoja.mostrar{transform:translate(-50%,0)}
 .hoja .asa{width:2.4em;height:.25em;border-radius:.2em;background:var(--tinta-suave);opacity:.5;margin:0 auto .95em}
@@ -178,12 +197,13 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 /* ---------- entrada / onboarding ---------- */
 .overlay-entrada{position:fixed;inset:0;background:var(--tinta-honda);color:var(--crema);z-index:60;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.4em 1.6em}
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:calc(2.4em + env(safe-area-inset-top)) calc(1.6em + env(safe-area-inset-right)) calc(2.4em + env(safe-area-inset-bottom)) calc(1.6em + env(safe-area-inset-left))}
 .overlay-entrada[hidden]{display:none}
 .paso-entrada{display:flex;flex-direction:column;align-items:center;width:100%}
 
 /* ---------- aviso ---------- */
-.aviso{position:fixed;left:50%;bottom:1.4em;transform:translate(-50%,150%);background:var(--tinta);color:var(--papel);
+.aviso{position:fixed;left:50%;bottom:calc(1.4em + env(safe-area-inset-bottom));transform:translate(-50%,150%);background:var(--tinta);color:var(--papel);
   padding:.8em 1.3em;border-radius:.7em;font-size:.85em;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
   transition:transform .25s ease;z-index:70;max-width:88%;text-align:center}
 .aviso.mostrar{transform:translate(-50%,0)}
@@ -205,7 +225,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
       <div class="m1">300 oraciones para rezar con la vida</div>
       <div class="m2">DIOS SABE MÁS</div>
     </div>
-    <button class="buscador" onclick="location.hash='#/buscar'"><span>⌕</span><em>Dilo con tus palabras</em></button>
+    <button class="buscador" onclick="location.hash='#/buscar'"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><em>Dilo con tus palabras</em></button>
     <div class="chips" id="chips-hoy"></div>
     <div style="margin-top:1.1em">
       <button class="boton hueco" style="width:100%" onclick="irAlAzar()">◈ Abrir al azar</button>
@@ -216,7 +236,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   <!-- BUSCAR -->
   <section class="pantalla" id="p-buscar">
     <div class="lect-top"><button class="icono-plano" onclick="history.back()">‹</button><span></span></div>
-    <div class="buscador"><span>⌕</span><input id="campo-buscar" type="search" placeholder="Dilo con tus palabras" autocomplete="off"></div>
+    <div class="buscador"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="campo-buscar" type="search" enterkeyhint="search" placeholder="Dilo con tus palabras" autocomplete="off"></div>
     <div id="contenido-buscar"></div>
   </section>
 
@@ -231,7 +251,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
   <section class="pantalla" id="p-capitulo">
     <div class="lect-top">
       <button class="icono-plano" onclick="history.back()">‹</button>
-      <button class="icono-plano" onclick="location.hash='#/buscar'">⌕</button>
+      <button class="icono-plano" onclick="location.hash='#/buscar'"><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
     </div>
     <div id="cabecera-capitulo" style="display:flex;gap:.8em;align-items:center;padding-bottom:.9em"></div>
     <div id="lista-capitulo"></div>
@@ -304,13 +324,13 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
     <div class="pie">Dios sabe más · Ignacio del Rey<br>Todos los textos son del autor y se usan con su permiso.<br>La app no guarda nada fuera de tu móvil.</div>
   </section>
 
-</div>
+  <nav class="navbar" id="navbar">
+    <button onclick="location.hash='#/hoy'" data-r="hoy"><i>⌂</i>Hoy</button>
+    <button onclick="location.hash='#/indice'" data-r="indice"><i>☰</i>Índice</button>
+    <button onclick="location.hash='#/guardadas'" data-r="guardadas"><i>♡</i>Guardadas</button>
+  </nav>
 
-<nav class="navbar" id="navbar">
-  <button onclick="location.hash='#/hoy'" data-r="hoy"><i>⌂</i>Hoy</button>
-  <button onclick="location.hash='#/indice'" data-r="indice"><i>☰</i>Índice</button>
-  <button onclick="location.hash='#/guardadas'" data-r="guardadas"><i>♡</i>Guardadas</button>
-</nav>
+</div>
 
 <div class="velo" id="velo" onclick="cerrarHojas()"></div>
 
