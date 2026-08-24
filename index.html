@@ -296,6 +296,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
       <div class="m1">300 oraciones para rezar con la vida</div>
       <div class="m2">DIOS SABE MÁS</div>
     </div>
+    <div id="saludo-hoy"></div>
     <button class="buscador" onclick="location.hash='#/buscar'"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><em>Dilo con tus palabras, o el número</em></button>
     <div class="chips" id="chips-hoy"></div>
     <div id="bloque-dia"></div>
@@ -488,7 +489,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v11 · 23 ago 2026';
+const VERSION_APP = 'v12 · 24 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -821,10 +822,21 @@ async function arrancar() {
     } catch (e) {
       console.error('descarga:', e);
       mostrarError(e);
-      return;
-    }
+      return;                              // trasCargarContenido() no corre aquí:
+    }                                       // reintentarCarga() la llama si el reintento sí funciona
   }
 
+  trasCargarContenido();
+}
+
+// Todo lo que tiene que pasar la PRIMERA vez que hay contenido cargado,
+// venga por donde venga: arranque normal, o recuperado tras un fallo desde
+// la pantalla de error. Antes esto solo corría en el camino feliz — si la
+// primera descarga fallaba (red floja justo al instalar, por ejemplo) y se
+// recuperaba con "Reintentar", el onboarding no se llegaba a plantear
+// nunca en esa sesión. En una PWA instalada que iOS reanuda en vez de
+// recargar de cero cada vez, eso podía significar que no saliera jamás.
+function trasCargarContenido() {
   if (!CONFIG.onboardingVisto) mostrarEntrada();
   if (CONFIG.wakeLock) activarWakeLock();
   pedirPersistencia();
@@ -846,6 +858,7 @@ async function reintentarCarga() {
   try {
     await guardarContenido(await descargarContenido(true));
     render();
+    trasCargarContenido();
   } catch (e) {
     mostrarError(e);
   }
@@ -1044,6 +1057,10 @@ function tarjeta(o, etiqueta) {
 
 function pantallaHoy() {
   mostrarPantalla('p-hoy', 'hoy');
+  // Justo encima del buscador, no hace falta entrar en Buscar para verlo.
+  document.getElementById('saludo-hoy').innerHTML = CONFIG.nombre
+    ? `<div class="marca" style="padding:0 0 .9em"><div class="m1">${esc(saludoPorHora())}, ${esc(CONFIG.nombre)}</div></div>`
+    : '';
   document.getElementById('chips-hoy').innerHTML = CHIPS_HOY.map(t =>
     `<button class="chip" onclick="irABuscarCon('${escAttr(t)}')">${esc(t)}</button>`).join('');
 
@@ -1117,10 +1134,9 @@ function renderizarBuscar(q) {
   const texto = (q || '').trim();
 
   if (!normalizarJS(texto)) {
-    const saludo = CONFIG.nombre
-      ? `<div class="marca" style="padding:.2em 0 1.1em"><div class="m1">${esc(saludoPorHora())}, ${esc(CONFIG.nombre)}</div></div>`
-      : '';
-    cont.innerHTML = saludo + `
+    // El saludo va en Hoy, encima del buscador (#saludo-hoy) — no aquí:
+    // no debía hacer falta entrar en Buscar para verlo.
+    cont.innerHTML = `
       <div class="bloque-tit">Lo que más se busca</div>
       ${SUGERENCIAS_BUSQUEDA.map(s => `<button class="fila" style="width:100%" onclick="buscarTexto('${escAttr(s)}')"><div class="barrita"></div><div>${esc(s)}</div></button>`).join('')}
       <div class="bloque-tit">Por número</div>

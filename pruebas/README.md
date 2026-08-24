@@ -12,8 +12,9 @@ IndexedDB simulado, y comprueban que **siempre se pinta algo**.
 
 ```bash
 npm install --no-save jsdom fake-indexeddb
-node pruebas/arranque.mjs          # con datos y con red
-node pruebas/arranque-sin-red.mjs  # primera apertura sin red
+node pruebas/arranque.mjs            # con datos y con red
+node pruebas/arranque-sin-red.mjs    # primera apertura sin red
+node pruebas/arranque-reintento.mjs  # primer intento falla, reintentar funciona
 ```
 
 Ambas salen con código 0 si todo va bien, 1 si algo falla. Antes de
@@ -38,6 +39,16 @@ Hace falta que exista `oraciones.json` en la raíz (`python generar_prueba.py`).
 - Sin nada en IndexedDB y con la descarga fallando, sale la pantalla de
   error con el botón de reintentar y un mensaje que explica que falta
   conexión — **nunca** una pantalla en blanco.
+
+`arranque-reintento.mjs`:
+
+- La primera descarga falla, sale la pantalla de error; al reintentar
+  (ahora sí responde) se recupera **y el onboarding de primera vez sigue
+  pudiendo aparecer** en esa misma sesión. Esto se rompió de verdad: el
+  chequeo de onboarding solo corría en el camino feliz de `arrancar()`,
+  nunca tras un `reintentarCarga()` con éxito. En una PWA instalada que
+  iOS reanuda en vez de recargar de cero, quien tuviera mala suerte con la
+  red justo al instalar no veía el onboarding jamás.
 
 ## Lo que NO cubren
 

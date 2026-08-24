@@ -150,31 +150,41 @@ else {
   if (!ocultaAlFinal) fallos++;
 }
 
-// Saludo personalizado: sin nombre no debe verse ningún hueco raro, y con
-// nombre guardado tiene que aparecer al entrar a Buscar con el campo vacío.
-console.log('\n--- SALUDO EN BUSCAR ---');
-window.location.hash = '#/buscar';
+// Saludo personalizado: EN HOY, encima del buscador — sin tener que entrar
+// a Buscar. Sin nombre no debe verse ningún hueco raro.
+console.log('\n--- SALUDO EN HOY (encima del buscador) ---');
+window.location.hash = '#/hoy';
 await esperar(120);
-const sinNombre = doc.getElementById('contenido-buscar').innerHTML;
-console.log('  sin nombre, sin saludo:', sinNombre.includes('class="marca"') ? 'FALLO: hay un hueco de saludo vacío' : 'OK');
-if (sinNombre.includes('class="marca"')) fallos++;
+const sinNombre = doc.getElementById('saludo-hoy').innerHTML.trim();
+console.log('  sin nombre, sin saludo:', sinNombre === '' ? 'OK' : 'FALLO: "' + sinNombre + '"');
+if (sinNombre !== '') fallos++;
+// Y tampoco tiene que aparecer dentro de Buscar (se movió, no se duplicó).
+window.location.hash = '#/buscar';
+await esperar(100);
+const buscarSinSaludo = doc.getElementById('contenido-buscar').innerHTML.includes('class="marca"');
+console.log('  no está (también) en Buscar:', buscarSinSaludo ? 'FALLO: sigue duplicado ahí' : 'OK');
+if (buscarSinSaludo) fallos++;
 
 // CONFIG es un "let" del script, no cuelga de window (a diferencia de las
 // funciones, que sí). Se pasa por la función pública de verdad, con
 // prompt() sustituido, en vez de intentar tocar el estado interno.
 window.prompt = () => 'Agustín';
 await window.cambiarNombre();
-// re-render directo: ya estábamos en #/buscar, así que reasignar el mismo
-// hash no dispara hashchange y no repintaría
-window.renderizarBuscar('');
-await esperar(80);
-const conNombre = doc.getElementById('contenido-buscar').textContent;
+window.location.hash = '#/hoy';
+await esperar(150);
+const conNombre = doc.getElementById('saludo-hoy').textContent;
 const hora = new Date().getHours();
 const esperado = hora < 13 ? 'Buenos días' : hora < 20 ? 'Buenas tardes' : 'Buenas noches';
-console.log('  con nombre, saluda:', conNombre.includes('Agustín') ? 'OK ("' + conNombre.slice(0, 40).trim() + '...")' : 'FALLO: no aparece el nombre');
+console.log('  con nombre, saluda:', conNombre.includes('Agustín') ? 'OK ("' + conNombre.trim() + '")' : 'FALLO: no aparece el nombre');
 if (!conNombre.includes('Agustín')) fallos++;
 console.log('  saludo acorde a la hora (' + esperado + '):', conNombre.includes(esperado) ? 'OK' : 'FALLO');
 if (!conNombre.includes(esperado)) fallos++;
+// El saludo colocado arriba del buscador, no en cualquier sitio de Hoy.
+const ordenHoy = [...doc.querySelectorAll('#p-hoy > *')].map(el => el.id || el.className);
+const iSaludo = ordenHoy.indexOf('saludo-hoy');
+const iBuscador = ordenHoy.findIndex(c => (c || '').includes('buscador'));
+console.log('  justo encima del buscador:', (iSaludo !== -1 && iSaludo === iBuscador - 1) ? 'OK' : 'FALLO: orden ' + ordenHoy.join(','));
+if (!(iSaludo !== -1 && iSaludo === iBuscador - 1)) fallos++;
 
 if (errores.length) { console.log('\nERRORES EN CONSOLA:'); errores.forEach(e => console.log('  ' + e)); }
 
