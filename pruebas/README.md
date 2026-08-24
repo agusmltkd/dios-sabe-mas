@@ -30,7 +30,7 @@ Hace falta que exista `oraciones.json` en la raíz (`python generar_prueba.py`).
 - Los chips y la oración del día se pintan de verdad.
 - Se navega a índice, buscar, leer, guardadas y ajustes, y cada ruta
   enseña su pantalla.
-- El enlace corto `#/o/59` abre la oración 59.
+- El enlace corto `#/o/7` abre la oración 7.
 - Escribir "57" en el buscador encuentra la 57 (entrar por número).
 - Las versiones de app y de contenido salen en Ajustes.
 

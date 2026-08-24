@@ -70,8 +70,8 @@ if (temaInicial !== 'noche') { console.log('FALLO: debería arrancar en noche');
 // Navegar a las demas pantallas
 console.log('\n--- NAVEGACION ---');
 for (const [hash, esperado] of [
-  ['#/indice', 'p-indice'], ['#/buscar?q=57', 'p-buscar'],
-  ['#/o/59', 'p-leer'], ['#/guardadas', 'p-guardadas'], ['#/ajustes', 'p-ajustes'],
+  ['#/indice', 'p-indice'], ['#/buscar?q=23', 'p-buscar'],
+  ['#/o/7', 'p-leer'], ['#/guardadas', 'p-guardadas'], ['#/ajustes', 'p-ajustes'],
 ]) {
   window.location.hash = hash;
   await esperar(120);
@@ -82,17 +82,19 @@ for (const [hash, esperado] of [
 }
 
 // Contenido concreto
-window.location.hash = '#/o/59';
+window.location.hash = '#/o/7';
 await esperar(150);
 const cuerpo = doc.getElementById('cuerpo-lectura').textContent;
-console.log('\nleyendo la 59 ->', cuerpo.slice(0, 55).replace(/\s+/g, ' ').trim());
-if (!cuerpo.includes('tarea')) { console.log('FALLO: no cargo la oracion 59'); fallos++; }
+console.log('\nleyendo la 7 ->', cuerpo.slice(0, 55).replace(/\s+/g, ' ').trim());
+if (!cuerpo.includes('caída')) { console.log('FALLO: no cargo la oracion 7'); fallos++; }
 
-window.location.hash = '#/buscar?q=57';
+window.location.hash = '#/buscar?q=23';
 await esperar(150);
 const busq = doc.getElementById('contenido-buscar').textContent;
-console.log('buscar "57" ->', busq.slice(0, 70).replace(/\s+/g, ' ').trim());
-if (!busq.includes('57')) { console.log('FALLO: entrar por numero no funciona'); fallos++; }
+console.log('buscar "23" ->', busq.slice(0, 70).replace(/\s+/g, ' ').trim());
+// no basta con que aparezca el "23" en algún sitio (un mensaje de "no
+// encontrada" también lo mencionaría) -- tiene que ser el resultado real.
+if (!busq.includes('cansancio')) { console.log('FALLO: entrar por numero no funciona'); fallos++; }
 
 window.location.hash = '#/ajustes';
 await esperar(150);
@@ -119,7 +121,7 @@ if (aviso.textContent !== '') fallos++;
 // Botón de inicio dentro de la lectura (pedido explícitamente: una
 // "casita" junto a guardar/compartir/pantalla que lleve a Hoy).
 console.log('\n--- BOTON DE INICIO EN LECTURA ---');
-window.location.hash = '#/o/59';
+window.location.hash = '#/o/7';
 await esperar(150);
 const btnInicio = doc.querySelector('#p-leer .acciones [aria-label="Inicio"]');
 console.log('  presente:', btnInicio ? 'OK' : 'FALLO: no esta');

@@ -8,11 +8,19 @@ Tres pasos, en este orden:
     python digitalizar.py paginas  fotos_paginas/    # -> oraciones.json
     python digitalizar.py validar                    # -> informe en pantalla
 
+En "indice" y "paginas", en vez de una carpeta de fotos también se puede
+pasar un único PDF (cada página del PDF = una página del libro, se
+renderiza internamente con PyMuPDF a la misma resolución que se usaría
+para una foto):
+
+    python digitalizar.py indice   indice.pdf
+    python digitalizar.py paginas  paginas.pdf
+
 El manifiesto se saca del índice del libro y es la verdad de referencia:
 300 títulos con su página y su capítulo. Todo lo que salga del paso 2 se
 contrasta contra él.
 
-Requiere:  pip install anthropic pillow
+Requiere:  pip install anthropic pillow pymupdf
            export ANTHROPIC_API_KEY=...
 """
 
@@ -23,6 +31,7 @@ import os
 import re
 import sys
 import unicodedata
+from collections import namedtuple
 from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -34,17 +43,23 @@ MODELO = "claude-sonnet-4-6"
 LADO_MAX = 1600          # px; suficiente para OCR y no dispara el coste
 MANIFIESTO = Path("manifiesto.json")
 ORACIONES = Path("oraciones.json")
+EXTS_IMAGEN = {".jpg", ".jpeg", ".png", ".heic", ".webp"}
 
 cliente = Anthropic()
+
+# Una imagen que transcribir, venga de una foto suelta o de una página de
+# PDF: "nombre" es solo para los mensajes de progreso y de error; "abrir"
+# carga la imagen al vuelo (no todas de golpe: un PDF de cientos de
+# páginas no cabría entero en memoria) y siempre devuelve un PIL.Image.
+Fuente = namedtuple("Fuente", "nombre abrir")
 
 
 # --------------------------------------------------------------------------
 # utilidades
 # --------------------------------------------------------------------------
 
-def preparar(ruta: Path) -> dict:
-    """Reescala y devuelve el bloque de imagen para la API."""
-    img = Image.open(ruta)
+def preparar_imagen(img: Image.Image) -> dict:
+    """Reescala una imagen ya cargada y arma el bloque para la API."""
     img = img.convert("RGB")
     if max(img.size) > LADO_MAX:
         factor = LADO_MAX / max(img.size)
@@ -60,6 +75,11 @@ def preparar(ruta: Path) -> dict:
             "data": base64.standard_b64encode(buf.getvalue()).decode(),
         },
     }
+
+
+def preparar(ruta: Path) -> dict:
+    """Igual que preparar_imagen(), pero abriendo un fichero suelto."""
+    return preparar_imagen(Image.open(ruta))
 
 
 def pedir_json(bloques, sistema: str, max_tokens: int = 8000):
@@ -86,9 +106,38 @@ def parecido(a: str, b: str) -> float:
     return SequenceMatcher(None, normalizar(a), normalizar(b)).ratio()
 
 
-def fotos(carpeta: str):
-    exts = {".jpg", ".jpeg", ".png", ".heic", ".webp"}
-    return sorted(p for p in Path(carpeta).iterdir() if p.suffix.lower() in exts)
+def fuentes(ruta: str) -> list:
+    """Admite dos formas de entrada, indistinguibles para quien llame:
+    una carpeta de fotos (una imagen = una página) o un único PDF (una
+    página del PDF = una página del libro). Devuelve una lista de Fuente
+    en orden de página."""
+    p = Path(ruta)
+    if p.is_dir():
+        archivos = sorted(a for a in p.iterdir() if a.suffix.lower() in EXTS_IMAGEN)
+        return [Fuente(nombre=a.name, abrir=lambda a=a: Image.open(a)) for a in archivos]
+    if p.is_file() and p.suffix.lower() == ".pdf":
+        return paginas_pdf(p)
+    sys.exit(f"{ruta} no es ni una carpeta de fotos ni un PDF.")
+
+
+def paginas_pdf(ruta_pdf: Path) -> list:
+    """Una Fuente por página del PDF, renderizada al lado máximo que ya usa
+    el resto del pipeline (LADO_MAX) — mismo compromiso nitidez/coste que
+    una foto, preparar_imagen() no tiene que volver a reescalar."""
+    # pip install pymupdf. El módulo se llamaba "fitz"; sigue funcionando
+    # pero avisa de que está obsoleto, así que se importa con su nombre nuevo.
+    import pymupdf
+
+    doc = pymupdf.open(ruta_pdf)
+
+    def abrir_pagina(i):
+        pagina = doc[i]
+        zoom = LADO_MAX / max(pagina.rect.width, pagina.rect.height)
+        pix = pagina.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom))
+        return Image.open(io.BytesIO(pix.tobytes("png")))
+
+    return [Fuente(nombre=f"{ruta_pdf.name} p.{i + 1}", abrir=lambda i=i: abrir_pagina(i))
+            for i in range(len(doc))]
 
 
 def leer_oraciones() -> list:
@@ -149,16 +198,16 @@ Reglas:
 - No inventes entradas que no veas."""
 
 
-def paso_indice(carpeta):
+def paso_indice(ruta):
     entradas = []
-    for f in fotos(carpeta):
-        print(f"  índice: {f.name}", flush=True)
+    for f in fuentes(ruta):
+        print(f"  índice: {f.nombre}", flush=True)
         try:
-            entradas += pedir_json([preparar(f),
+            entradas += pedir_json([preparar_imagen(f.abrir()),
                                     {"type": "text", "text": "Transcribe este índice."}],
                                    SISTEMA_INDICE)
         except Exception as e:
-            print(f"    !! fallo en {f.name}: {e}")
+            print(f"    !! fallo en {f.nombre}: {e}")
 
     # arrastrar el capítulo hacia abajo cuando la página no lo repetía
     actual = None
@@ -212,14 +261,14 @@ Reglas:
 - No inventes texto para rellenar."""
 
 
-def paso_paginas(carpeta):
-    archivos = fotos(carpeta)
+def paso_paginas(ruta):
+    archivos = fuentes(ruta)
     salida, i = [], 0
     # de dos en dos y con solape de una, para no perder oraciones a caballo
     while i < len(archivos):
         lote = archivos[i:i + 2]
-        print(f"  páginas: {', '.join(f.name for f in lote)}", flush=True)
-        bloques = [preparar(f) for f in lote]
+        print(f"  páginas: {', '.join(f.nombre for f in lote)}", flush=True)
+        bloques = [preparar_imagen(f.abrir()) for f in lote]
         bloques.append({"type": "text",
                         "text": "Transcribe las oraciones de estas páginas."})
         try:

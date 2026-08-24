@@ -12,9 +12,15 @@ worker/README.md
 oraciones.json
 manifiesto.json
 
-# fotos usadas por digitalizar.py — nunca deberían entrar en git
+# fotos y PDFs escaneados del libro, usados por digitalizar.py — nunca
+# deberían entrar en git. *.pdf es una red ancha a propósito: no se
+# quiere depender de que el escaneo se llame "indice.pdf" o "paginas.pdf"
+# para que quede cubierto. No afecta a dios-sabe-mas-pantallas.pdf (la
+# maqueta, ya trackeada) — gitignore nunca destrackea lo que ya está en git,
+# solo evita que algo nuevo entre.
 fotos_indice/
 fotos_paginas/
+*.pdf
 
 # temporales que a veces dejo tirados al comprobar la sintaxis del JS
 _extract*.js
@@ -23,6 +29,10 @@ _extract*.js
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# caché de bytecode de Python, la genera cualquier import (p.ej. al probar
+# digitalizar.py)
+__pycache__/
 
 # ajustes locales del editor/harness, no son del proyecto
 .claude/
