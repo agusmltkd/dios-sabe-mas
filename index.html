@@ -21,7 +21,11 @@
 // abrir en modo día un instante antes de pasar a noche.
 (function () {
   try {
-    var pref = localStorage.getItem('tema') || 'auto';
+    // Noche es el predeterminado (no "auto"): es la versión más fiel de
+    // la app, y lo primero que se ve tiene que ser ese azul, aunque el
+    // sistema esté en modo claro. "Auto" sigue disponible en Ajustes
+    // para quien lo prefiera — esto solo decide antes de haber elegido.
+    var pref = localStorage.getItem('tema') || 'noche';
     var resuelto = pref === 'auto'
       ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'noche' : 'dia')
       : pref;
@@ -498,7 +502,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v14 · 24 ago 2026';
+const VERSION_APP = 'v15 · 24 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -528,7 +532,10 @@ let ORACIONES = [];               // oraciones en memoria, en orden de libro
 let META = { version: null, fecha: null, firma: null };
 let GUARDADAS = new Map();        // n -> fecha ISO de guardado
 let CONFIG = {
-  tema: 'auto', tamano: 'mediano', wakeLock: false,
+  // 'noche' por defecto, no 'auto' — es la versión más fiel de la app.
+  // Auto sigue siendo una opción elegible en Ajustes, solo deja de ser
+  // el punto de partida.
+  tema: 'noche', tamano: 'mediano', wakeLock: false,
   onboardingVisto: false, ultimaLeida: null, historial: [], recientes: [],
   nombre: null,
 };

@@ -59,6 +59,14 @@ console.log('oracion del dia:', dia ? dia.slice(0, 60) : '(vacia)');
 if (!chips) { console.log('FALLO: no se pintaron los chips'); fallos++; }
 if (!dia) { console.log('FALLO: no se pinto la oracion del dia'); fallos++; }
 
+// Noche por defecto, no "auto": tiene que verse en noche incluso con el
+// sistema en modo claro (aquí matchMedia está mockeado con matches:false,
+// como si el dispositivo prefiriera claro) y sin ninguna preferencia
+// guardada todavía — es justo la instalación nueva que pidió Agustín.
+const temaInicial = doc.documentElement.getAttribute('data-tema');
+console.log('tema por defecto (sistema en claro, nada guardado):', temaInicial);
+if (temaInicial !== 'noche') { console.log('FALLO: debería arrancar en noche'); fallos++; }
+
 // Navegar a las demas pantallas
 console.log('\n--- NAVEGACION ---');
 for (const [hash, esperado] of [
