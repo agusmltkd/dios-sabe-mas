@@ -28,7 +28,7 @@
  * Al cambiar index.html, sube CACHE_VERSION: tira las cachés viejas.
  */
 
-const CACHE_VERSION = "v10";
+const CACHE_VERSION = "v11";
 const CACHE_SHELL = `dios-sabe-mas-shell-${CACHE_VERSION}`;
 const CACHE_DATOS = `dios-sabe-mas-datos-${CACHE_VERSION}`;
 
@@ -41,6 +41,7 @@ const SHELL = [
   "./iconos/icon-maskable-512.png",
   "./iconos/apple-touch-icon.png",
   "./iconos/favicon.png",
+  "./iconos/logo-apertura.png",
 ];
 
 self.addEventListener("install", (evento) => {

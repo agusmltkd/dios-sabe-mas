@@ -12,6 +12,10 @@ lo reescala y le añade el margen que necesita cada uso:
   de la flecha y el brazo derecho del "+". Se encoge más para dejar sitio.
 - apple-touch-icon: igual que el normal, pero forzado a RGB opaco (iOS no
   quiere canal alfa).
+- logo-apertura: para la pantalla de apertura (splash), NO como icono —
+  reescalado sin recorte ni margen extra, más ligero que el original
+  (1MB de PNG en cada apertura de la app sería demasiado), con la paleta
+  reducida porque el motivo es casi bicolor y así pesa una cuarta parte.
 
 Genera:
     iconos/icon-192.png
@@ -19,6 +23,7 @@ Genera:
     iconos/icon-maskable-512.png
     iconos/apple-touch-icon.png
     iconos/favicon.png
+    iconos/logo-apertura.png
 
 Uso:
     python generar_iconos.py
@@ -65,4 +70,10 @@ procesar(180, escala=0.90).save(DEST / "apple-touch-icon.png")
 # favicon: algo menos de margen, para que el trazo no se pierda a 48px
 procesar(48, escala=0.94).save(DEST / "favicon.png")
 
-print(f"5 iconos -> {DEST}/ (fuente: {FUENTE})")
+# apertura: el logo entero, sin recorte de icono — se ve en pantalla
+# completa "incrustado" en el fondo de la splash, no como un icono flotando
+origen = Image.open(FUENTE).convert("RGB")
+apertura = origen.resize((480, 480), Image.LANCZOS).quantize(colors=48, method=Image.MEDIANCUT)
+apertura.save(DEST / "logo-apertura.png", optimize=True)
+
+print(f"6 ficheros -> {DEST}/ (fuente: {FUENTE})")

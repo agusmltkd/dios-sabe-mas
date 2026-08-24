@@ -117,10 +117,16 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 .barrita{width:.26em;height:1.7em;background:var(--tinta);border-radius:.13em;opacity:.85;flex:0 0 auto}
 
 /* ---------- marca ---------- */
-.marca{padding:.55em 0 1.3em;text-align:center}
+.marca{padding:.55em 0 .5em;text-align:center}
 .marca .m1{font-family:'Sacramento',cursive;font-size:1.4em;color:var(--tinta-secundaria);line-height:1}
-.marca .m2{font-size:1.3em;letter-spacing:.26em;font-weight:200;margin-top:.12em}
+.marca .m2{font-size:1.55em;letter-spacing:.24em;font-weight:200;margin-top:.12em}
 .marca .m2.chico{font-size:1.1em}
+/* saludo de Hoy: más protagonista que el resto de la marca */
+.saludo-grande{font-family:'Sacramento',cursive;font-size:2em;line-height:1.05;
+  color:var(--tinta);text-align:center;padding:0 0 1em}
+/* lema al fondo de Hoy, discreto — antes iba arriba en grande */
+.lema-pie{font-family:'Sacramento',cursive;font-size:.95em;color:var(--tinta-secundaria);
+  text-align:center;margin-top:1.6em;padding-top:1.1em;border-top:1px solid var(--linea)}
 
 /* ---------- controles ---------- */
 .buscador{display:flex;align-items:center;gap:.6em;border:1px solid var(--linea);border-radius:.7em;padding:.82em 1em;background:var(--papel-hueso);width:100%;text-align:left;min-height:44px}
@@ -221,15 +227,17 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 /* ---------- apertura ---------- */
 /* z-index por encima del onboarding: si es la primera vez, la apertura
    tapa el overlay de entrada mientras dura y al retirarse deja verlo. */
-.splash{position:fixed;inset:0;z-index:80;background:var(--tinta-honda);color:var(--crema);
+/* Fondo al mismo azul que el propio logo.png (#02679C): así la imagen no
+   se recorta como si fuera un icono con su propio marco — el trazo blanco
+   queda incrustado directamente en el fondo de la pantalla, sin costura. */
+.splash{position:fixed;inset:0;z-index:80;background:#02679C;color:var(--crema);
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
   padding:calc(2em + env(safe-area-inset-top)) 1.6em calc(2em + env(safe-area-inset-bottom));
   transition:opacity .4s ease,visibility .4s}
 .splash.oculto{opacity:0;visibility:hidden;pointer-events:none}
-.splash-logo{width:104px;height:104px;border-radius:24px;margin-bottom:1.5em;
-  box-shadow:0 22px 50px -18px rgba(0,0,0,.6)}
-.splash-sub{font-family:'Sacramento',cursive;font-size:1.35em;opacity:.85;margin-bottom:.35em}
-.splash-marca{font-size:1.15em;letter-spacing:.32em;font-weight:200}
+.splash-logo{width:min(62vw,280px);height:auto;display:block;margin-bottom:1.1em}
+.splash-sub{font-family:'Sacramento',cursive;font-size:1.3em;opacity:.9;margin-bottom:.3em}
+.splash-marca{font-size:1.7em;letter-spacing:.28em;font-weight:200}
 
 /* ---------- entrada / onboarding ---------- */
 .overlay-entrada{position:fixed;inset:0;background:var(--tinta-honda);color:var(--crema);z-index:60;
@@ -280,9 +288,9 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
      defecto en el HTML para que sea lo primero que se pinta, antes incluso
      de que el script termine de cargar los datos. -->
 <div class="splash" id="splash" onclick="ocultarSplash()">
-  <img src="iconos/icon-192.png" alt="" class="splash-logo">
-  <div class="splash-sub">300 oraciones para rezar con la vida</div>
+  <img src="iconos/logo-apertura.png" alt="" class="splash-logo">
   <div class="splash-marca">DIOS SABE MÁS</div>
+  <div class="splash-sub">300 oraciones para rezar con la vida</div>
 </div>
 
 <div class="app" id="app">
@@ -293,16 +301,16 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
       <button class="icono-plano" onclick="location.hash='#/ajustes'" aria-label="Ajustes">⚙</button>
     </div>
     <div class="marca">
-      <div class="m1">300 oraciones para rezar con la vida</div>
       <div class="m2">DIOS SABE MÁS</div>
     </div>
     <div id="saludo-hoy"></div>
     <button class="buscador" onclick="location.hash='#/buscar'"><span><svg class="ico-buscar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><em>Dilo con tus palabras, o el número</em></button>
     <div class="chips" id="chips-hoy"></div>
+    <div style="margin-top:1.1em"><button class="boton hueco" style="width:100%" onclick="irAlAzar()">◈ Abrir al azar</button></div>
     <div id="bloque-dia"></div>
     <div id="seguias-aqui"></div>
     <div id="recientes-hoy"></div>
-    <div style="margin-top:1.3em"><button class="boton hueco" style="width:100%" onclick="irAlAzar()">◈ Abrir al azar</button></div>
+    <div class="lema-pie">300 oraciones para rezar con la vida</div>
   </section>
 
   <!-- BUSCAR -->
@@ -489,7 +497,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v12 · 24 ago 2026';
+const VERSION_APP = 'v13 · 24 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
@@ -1059,7 +1067,7 @@ function pantallaHoy() {
   mostrarPantalla('p-hoy', 'hoy');
   // Justo encima del buscador, no hace falta entrar en Buscar para verlo.
   document.getElementById('saludo-hoy').innerHTML = CONFIG.nombre
-    ? `<div class="marca" style="padding:0 0 .9em"><div class="m1">${esc(saludoPorHora())}, ${esc(CONFIG.nombre)}</div></div>`
+    ? `<div class="saludo-grande">${esc(saludoPorHora())}, ${esc(CONFIG.nombre)}</div>`
     : '';
   document.getElementById('chips-hoy').innerHTML = CHIPS_HOY.map(t =>
     `<button class="chip" onclick="irABuscarCon('${escAttr(t)}')">${esc(t)}</button>`).join('');
