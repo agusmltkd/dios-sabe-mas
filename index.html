@@ -227,10 +227,11 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 /* ---------- apertura ---------- */
 /* z-index por encima del onboarding: si es la primera vez, la apertura
    tapa el overlay de entrada mientras dura y al retirarse deja verlo. */
-/* Fondo al mismo azul que el propio logo.png (#02679C): así la imagen no
-   se recorta como si fuera un icono con su propio marco — el trazo blanco
-   queda incrustado directamente en el fondo de la pantalla, sin costura. */
-.splash{position:fixed;inset:0;z-index:80;background:#02679C;color:var(--crema);
+/* El mismo azul que el resto de la app (el de .overlay-entrada, el modo
+   noche, los botones sólidos) — no el azul propio del logo. El logo en sí
+   (logo-marca.png) tiene el fondo recortado a transparencia real, así que
+   encaja sin costura sea cual sea el color de fondo de aquí. */
+.splash{position:fixed;inset:0;z-index:80;background:var(--tinta-honda);color:var(--crema);
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
   padding:calc(2em + env(safe-area-inset-top)) 1.6em calc(2em + env(safe-area-inset-bottom));
   transition:opacity .4s ease,visibility .4s}
@@ -288,7 +289,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
      defecto en el HTML para que sea lo primero que se pinta, antes incluso
      de que el script termine de cargar los datos. -->
 <div class="splash" id="splash" onclick="ocultarSplash()">
-  <img src="iconos/logo-apertura.png" alt="" class="splash-logo">
+  <img src="iconos/logo-marca.png" alt="" class="splash-logo">
   <div class="splash-marca">DIOS SABE MÁS</div>
   <div class="splash-sub">300 oraciones para rezar con la vida</div>
 </div>
@@ -497,7 +498,7 @@ mark{background:var(--crema);color:var(--tinta-honda);padding:0 .15em;border-rad
 
 // Súbela a mano en cada despliegue: es lo que permite comprobar desde el
 // móvil si ya ha llegado la versión nueva o se ve una copia cacheada.
-const VERSION_APP = 'v13 · 24 ago 2026';
+const VERSION_APP = 'v14 · 24 ago 2026';
 
 const TITULO_LIBRO = 'Dios sabe más';
 const AUTOR_LIBRO = 'Ignacio del Rey';
